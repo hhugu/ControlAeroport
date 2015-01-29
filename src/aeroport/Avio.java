@@ -90,7 +90,6 @@ public class Avio extends Thread {
 			}
 		}
 	}
-	
 	public synchronized void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
 		int iniX, iniY, finX, finY;
 		
