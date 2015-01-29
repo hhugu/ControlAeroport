@@ -35,7 +35,7 @@ public class Avio extends Thread {
 		}
         cmLong = 1000;
         cmWidth = 1000;
-        speed = 30;
+        speed = 20;
         
         this.finger = finger;
         this.rutaAlFinger = rutaAlFinger;
@@ -55,24 +55,20 @@ public class Avio extends Thread {
 			if (!Aeroport.isPaused()) {
 				try {
 					Thread.sleep(10);
-					
-					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				
 				if (direction == Direction.BACKWARD) cmPosition -= speed;
 				else if(direction == Direction.FORWARD) cmPosition += speed;
 				
+				if(estat == EstatAvio.GOFINGER) calcularProximCarrer(rutaAlFinger);
+				else if(estat == EstatAvio.GOPISTA)	calcularProximCarrer(rutaDespegue);
+				
 				if(cmPosition > way.getCmLong() && estat != EstatAvio.DESPEGANT) this.direction = Direction.BACKWARD;
 				if(cmPosition < 0 && estat != EstatAvio.DESPEGANT) this.direction = Direction.FORWARD;
-				if(cmPosition < -200 || cmPosition > way.getCmLong()+200){
-					fin = true;
-				}
 				
-				if(estat == EstatAvio.GOFINGER) calcularProximCarrer(rutaAlFinger);
-				else if(estat == EstatAvio.GOPISTA){
-					calcularProximCarrer(rutaDespegue);
-				}
+				if(cmPosition < -5000 || cmPosition > way.getCmLong()+5000) fin = true;
 				
 				if(way instanceof Finger && cmPosition>=way.cmLong){
 					try {

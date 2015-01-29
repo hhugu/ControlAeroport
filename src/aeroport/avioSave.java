@@ -12,6 +12,7 @@
 //
 //public class Avio extends Thread {
 //
+//	private Controlador controlador;
 //    private int cmLong, cmWidth, speed, posicio = 0;
 //    private volatile int cmPosition;
 //    private Image imgAvioH, imgAvioV;
@@ -19,12 +20,13 @@
 //    private Finger finger;
 //    private String idAvio;
 //    private Direction direction;
-//    private CrossRoad proximCruce = null;
-//    private ArrayList<Carrer> rutaAlFinger, rutaDespegue;
+//    private CrossRoad cruceActual = null;
+//    private ArrayList<String> rutaAlFinger, rutaDespegue;
 //    private EstatAvio estat;
 //    
-//    public Avio(String idAvio, Carrer way, Direction direction, Finger finger, ArrayList<Carrer> rutaAlFinger, ArrayList<Carrer> rutaDespegue) {
-//        this.idAvio = idAvio;
+//    public Avio(Controlador controlador, String idAvio, Carrer way, Direction direction, Finger finger, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue) {
+//       this.controlador = controlador;
+//    	this.idAvio = idAvio;
 //        try {
 //			imgAvioH = ImageIO.read(new File("Imagenes/avioH.png"));
 //			imgAvioV = ImageIO.read(new File("Imagenes/avioV.png"));
@@ -33,7 +35,7 @@
 //		}
 //        cmLong = 1000;
 //        cmWidth = 1000;
-//        speed = 10;
+//        speed = 30;
 //        
 //        this.finger = finger;
 //        this.rutaAlFinger = rutaAlFinger;
@@ -48,7 +50,8 @@
 //	public void run(){
 //		cmPosition = way.getEntryPoint(getDirection());
 //		estat = EstatAvio.GOFINGER;
-//		while(true){
+//		boolean fin = false;
+//		while(!fin){
 //			if (!Aeroport.isPaused()) {
 //				try {
 //					Thread.sleep(10);
@@ -60,18 +63,23 @@
 //				if (direction == Direction.BACKWARD) cmPosition -= speed;
 //				else if(direction == Direction.FORWARD) cmPosition += speed;
 //				
-//				if(cmPosition == way.getCmLong()) this.direction = Direction.BACKWARD;
-//				if(cmPosition == 0) this.direction = Direction.FORWARD;
+//				if(cmPosition > way.getCmLong() && estat != EstatAvio.DESPEGANT) this.direction = Direction.BACKWARD;
+//				if(cmPosition < 0 && estat != EstatAvio.DESPEGANT) this.direction = Direction.FORWARD;
+//				if(cmPosition < -200 || cmPosition > way.getCmLong()+200){
+//					fin = true;
+//				}
 //				
 //				if(estat == EstatAvio.GOFINGER) calcularProximCarrer(rutaAlFinger);
-//				else if(estat == EstatAvio.GOPISTA) calcularProximCarrer(rutaDespegue);
+//				else if(estat == EstatAvio.GOPISTA){
+//					calcularProximCarrer(rutaDespegue);
+//				}
 //				
-//				if(way instanceof Finger){
+//				if(way instanceof Finger && cmPosition>=way.cmLong){
 //					try {
-//						finger.setEstat(Estat.ocupat);
+//						controlador.canviarEstatFinger(finger, Estat.ocupat);
 //						Thread.sleep(5000);
 //						estat = EstatAvio.GOPISTA;
-//						finger.setEstat(Estat.buit);
+//						controlador.canviarEstatFinger(finger, Estat.buit);
 //						posicio = 0;
 //					} catch (InterruptedException e) {
 //						e.printStackTrace();
@@ -112,15 +120,19 @@
 //   		}
 //    }
 //	
-//    private void calcularProximCarrer(ArrayList<Carrer> ruta) {
+//    private void calcularProximCarrer(ArrayList<String> ruta) {
 //		if (way.insideAnyCrossRoad(cmPosition)) {
-//			proximCruce = way.intersectedCrossRoad(cmPosition);
-//			System.out.println("*********************\n"+proximCruce.getId());
+//			cruceActual = way.intersectedCrossRoad(cmPosition);
 //			if (posicio < ruta.size()) {
-//				if (proximCruce.getCarrer(way).equals(ruta.get(posicio))) {
-//					way = proximCruce.getCarrer(way);
-//					cmPosition = way.getEntryPoint(getDirection());
-//					System.out.println("Carrer acutual: " + way.idWay);
+//				if (cruceActual.getCarrer(way).getId().equals(ruta.get(posicio))) {
+//					Carrer anterior = way;
+//					way = cruceActual.getCarrer(way);
+//					if(way.getId().equals("pista")) this.estat = EstatAvio.DESPEGANT;
+//					if(way.direccio != null) this.direction = way.direccio;
+//					cmPosition = way.getCmPosition(
+//											       anterior.getCmPosX(this.cmPosition, this.direction),
+//												   anterior.getCmPosY(this.cmPosition, this.direction),
+//												   this.direction);
 //					posicio++;
 //				}
 //			}
@@ -158,7 +170,7 @@
 //
 //        public static Direction getDirection(Orientation orientation) {
 //            if ((orientation == Orientation.SOUDTH) || (orientation == Orientation.EAST)) {
-//                return Direction.FORWARD; // =================================>>
+//                return Direction.FORWARD;  
 //            }
 //            return Direction.BACKWARD;
 //        }
@@ -170,17 +182,17 @@
 //        public static Orientation getOrientation(Carrer way, Direction direction) {
 //            if (way instanceof VCarrer) {
 //                if (direction == Direction.FORWARD) {
-//                    return Orientation.SOUDTH; //=============================>>
+//                    return Orientation.SOUDTH; 
 //                } else {
-//                    return Orientation.NORTH; //==============================>>
+//                    return Orientation.NORTH; 
 //                }
 //            }
 //
 //            if (way instanceof HCarrer) {
 //                if (direction == Direction.FORWARD) {
-//                    return Orientation.EAST; //===============================>>
+//                    return Orientation.EAST; 
 //                } else {
-//                    return Orientation.WEST; //===============================>>
+//                    return Orientation.WEST; 
 //                }
 //            }
 //

@@ -11,7 +11,7 @@ public class Controlador implements Runnable{
 	private ArrayList <Carrer> carrers;
 	private ArrayList<Finger> fingers;
 	private ArrayList<String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
-	private int maxAvions= 3, random;
+	private int maxAvions= 10, random;
 	
 	public Controlador(ArrayList<Carrer> carrers, ArrayList<Finger> fingers){
 		this.carrers = carrers;
@@ -34,7 +34,7 @@ public class Controlador implements Runnable{
 				try {
 					addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), finger);
 					rutaAlFingerOest.remove(rutaAlFingerOest.size()-1);
-					Thread.sleep(5000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -55,9 +55,8 @@ public class Controlador implements Runnable{
 		Finger finger = getPrimerFingerBuit();
 		while(finger == null){
 			try {
-				System.out.println("Estan tots plens");
 				finger = getPrimerFingerBuit();
-				Thread.sleep(2000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
