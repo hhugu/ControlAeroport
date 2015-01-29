@@ -82,7 +82,7 @@ public class Avio extends Thread {
 						estat = EstatAvio.GOPISTA;
 						controlador.canviarEstatFinger(finger, Estat.buit);
 						posicio = 0;
-						System.out.println("sk,flñdsh");
+						System.out.println("dfkh");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
