@@ -18,7 +18,7 @@ public abstract class Carrer {
     protected int cmMark;
     protected Direction direccio;
     protected ArrayList<Avio> avions = new ArrayList<Avio>();
-    protected ArrayList<CrossRoad> crossRoads = new ArrayList<CrossRoad>();
+    protected ArrayList<CrossRoad> crossroads = new ArrayList<CrossRoad>();
     protected ArrayList<Integer> forwardEntryPoint = new ArrayList<Integer>();
     protected ArrayList<Integer> backwardEntryPoint = new ArrayList<Integer>();
 
@@ -34,10 +34,13 @@ public abstract class Carrer {
         this.createDefaultEntryPoints();
     }
     
-    public CrossRoad getRandomCrossRoad(){
-    	int i = (int)(Math.random()*crossRoads.size());
-    	System.out.println(i+ "crossRoad");
-    	return crossRoads.get(i);
+    public CrossRoad getNextCrossRoad(String proximCarrer, Carrer c){
+    	for (int i = 0; i < crossroads.size(); i++) {
+			if (crossroads.get(i).getCarrer(c).getId().equals(proximCarrer)) {
+				return crossroads.get(i);
+			}
+		}
+    	return null;
     }
 
     public String getId() {

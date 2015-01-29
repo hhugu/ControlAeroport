@@ -20,7 +20,7 @@ public class Avio extends Thread {
     private Finger finger;
     private String idAvio;
     private Direction direction;
-    private CrossRoad cruceActual = null;
+    private CrossRoad cruceActual = null, proximCruce = null;
     private ArrayList<String> rutaAlFinger, rutaDespegue;
     private EstatAvio estat;
     
@@ -35,7 +35,7 @@ public class Avio extends Thread {
 		}
         cmLong = 1000;
         cmWidth = 1000;
-        speed = 20;
+        speed = 5;
         
         this.finger = finger;
         this.rutaAlFinger = rutaAlFinger;
@@ -54,7 +54,7 @@ public class Avio extends Thread {
 		while(!fin){
 			if (!Aeroport.isPaused()) {
 				try {
-					Thread.sleep(10);
+					Thread.sleep(2);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -65,12 +65,27 @@ public class Avio extends Thread {
 				if(estat == EstatAvio.GOFINGER) calcularProximCarrer(rutaAlFinger);
 				else if(estat == EstatAvio.GOPISTA)	calcularProximCarrer(rutaDespegue);
 				
-				if(cmPosition > way.getCmLong() && estat != EstatAvio.DESPEGANT) this.direction = Direction.BACKWARD;
-				if(cmPosition < 0 && estat != EstatAvio.DESPEGANT) this.direction = Direction.FORWARD;
+				if(cmPosition >= way.getCmLong() && estat != EstatAvio.DESPEGANT) this.direction = Direction.BACKWARD;
+				if(cmPosition <= 0 && estat != EstatAvio.DESPEGANT) this.direction = Direction.FORWARD;
 				
 				if(cmPosition < -5000 || cmPosition > way.getCmLong()+5000) fin = true;
 				
-				
+				if(way instanceof Finger && (cmPosition + this.cmLong) >=way.cmLong){
+					int temp = cmPosition;
+					direction = Direction.BACKWARD;
+					cmPosition = way.getCmLong(); 
+					
+					try {
+						controlador.canviarEstatFinger(finger, Estat.ocupat);
+						Thread.sleep(5000);
+						cmPosition = temp;
+						estat = EstatAvio.GOPISTA;
+						controlador.canviarEstatFinger(finger, Estat.buit);
+						posicio = 0;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
@@ -107,14 +122,22 @@ public class Avio extends Thread {
     }
 	
     private void calcularProximCarrer(ArrayList<String> ruta) {
-		if (way.insideAnyCrossRoad(cmPosition)) {
+		
+    	if (way.insideAnyCrossRoad(cmPosition)) {
 			cruceActual = way.intersectedCrossRoad(cmPosition);
 			if (posicio < ruta.size()) {
 				if (cruceActual.getCarrer(way).getId().equals(ruta.get(posicio))) {
 					Carrer anterior = way;
 					way = cruceActual.getCarrer(way);
+					
+					if (posicio + 1 < ruta.size()) proximCruce = way.getNextCrossRoad(ruta.get(posicio+1), way);
+
+					if(way instanceof HCarrer) direction = obtenirDireccio(cruceActual, proximCruce, 0);
+					else if(way instanceof VCarrer) direction = obtenirDireccio(cruceActual, proximCruce, 1);
+					else if(way instanceof Finger) direction = Direction.FORWARD;
+					
 					if(way.getId().equals("pista")) this.estat = EstatAvio.DESPEGANT;
-					if(way.direccio != null) this.direction = way.direccio;
+					
 					cmPosition = way.getCmPosition(
 											       anterior.getCmPosX(this.cmPosition, this.direction),
 												   anterior.getCmPosY(this.cmPosition, this.direction),
@@ -126,6 +149,17 @@ public class Avio extends Thread {
 	
 	}
     
+	private Direction obtenirDireccio(CrossRoad cruceActual, CrossRoad proximCruce, int i) {
+		switch(i){
+			case 0: if (cruceActual.getIniX() < proximCruce.getIniX()) return Direction.FORWARD;
+					else return Direction.BACKWARD;
+			
+			case 1: if (cruceActual.getIniY() < proximCruce.getIniY()) return Direction.FORWARD;
+					else return Direction.BACKWARD;
+		}
+		return null;
+	}
+
 	public static enum EstatAvio {ATERRANT, GOFINGER, ATURAT, GOPISTA, DESPEGANT};
 
     public static enum Direction {

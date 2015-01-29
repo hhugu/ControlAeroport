@@ -35,7 +35,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         this.map = new Mapa(Aeroport.CIUTAT_CM_WIDTH, Aeroport.CIUTAT_CM_HEIGHT, Aeroport.MAPA_PIX_WIDTH, Aeroport.MAPA_PIX_HEIGH);
 
         this.createFrame();
-        this.traffic = new Controlador(this.map.getCarrers(), this.map.getFingers());
+        this.traffic = new Controlador(this.map.getCarrers(), this.map.getFingers(), this.map);
         this.map.setControlador(this.traffic);
 
         new Thread(this.map).start();

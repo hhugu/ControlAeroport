@@ -41,7 +41,7 @@ public class Finger extends Carrer {
 	}
 	
 	public void addCrossRoad(CrossRoad cr) {
-		this.crossRoads.add(cr);
+		this.crossroads.add(cr);
 	}
 
 	public void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
@@ -65,7 +65,7 @@ public class Finger extends Carrer {
 
 		inFrontCR = null;
 		minDistance = this.getCmLong() + 1;
-		itr = this.crossRoads.iterator();
+		itr = this.crossroads.iterator();
 		while (itr.hasNext()) {
 			actualCR = itr.next();
 
@@ -98,7 +98,7 @@ public class Finger extends Carrer {
 
 		cmPosY = this.getCmPosY(cmPosition, Direction.FORWARD);
 
-		Iterator<CrossRoad> itr = this.crossRoads.iterator();
+		Iterator<CrossRoad> itr = this.crossroads.iterator();
 		while (itr.hasNext()) {
 			cr = itr.next();
 

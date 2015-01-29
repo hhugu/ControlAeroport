@@ -7,34 +7,37 @@ import aeroport.Avio.Direction;
 import aeroport.Finger.Estat;
 
 public class Controlador implements Runnable{
+	private Mapa mapa;
 	private ArrayList <Avio> avions = new ArrayList<Avio>();
 	private ArrayList <Carrer> carrers;
 	private ArrayList<Finger> fingers;
 	private ArrayList<String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
-	private int maxAvions= 10, random;
+	private int maxAvions= 40, random;
 	
-	public Controlador(ArrayList<Carrer> carrers, ArrayList<Finger> fingers){
+	public Controlador(ArrayList<Carrer> carrers, ArrayList<Finger> fingers, Mapa mapa){
 		this.carrers = carrers;
 		this.fingers = fingers;
-		
+		this.mapa = mapa;
 		crearRutes();
 	}
 	
 	public void run() {
-		Direction direccio;
+		Direction direccio = null;
+		int vent;
 		if(!Aeroport.isPaused()){
 			for(int i=0; i<maxAvions; i++){
-				random = (int) (Math.random()*1); //Cambiar a 2 cuan pugui
-				if (random == 0) direccio = Direction.BACKWARD;
-				else direccio = Direction.FORWARD;
+				vent = mapa.getVent();
+				if(vent == 0) direccio = Direction.FORWARD;
+				else if(vent ==1) direccio = Direction.BACKWARD;
 				
-				ArrayList<String> rutaAlFinger = triarRutaAlFinger(random);
+				ArrayList<String> rutaAlFinger = triarRutaAlFinger(vent);
+				ArrayList<String> rutaDespegue = triarRutaDespegue(vent);
 				Finger finger = afegirFingerARuta(rutaAlFinger);
 				
 				try {
-					addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), finger);
-					rutaAlFingerOest.remove(rutaAlFingerOest.size()-1);
-					Thread.sleep(2000);
+					addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
+					rutaAlFinger.remove(rutaAlFinger.size()-1);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -45,8 +48,16 @@ public class Controlador implements Runnable{
 	
 	private ArrayList<String> triarRutaAlFinger(int vent) {
 		switch(vent){
-		case 0: return rutaAlFingerOest;
-		case 1: return rutaAlFingerEst;
+		case 0: return rutaAlFingerEst;
+		case 1: return rutaAlFingerOest;
+		}
+		return null;
+	}
+	
+	private ArrayList<String> triarRutaDespegue(int vent) {
+		switch(vent){
+		case 0: return rutaDespegueEst;
+		case 1: return rutaDespegueOest;
 		}
 		return null;
 	}
@@ -99,8 +110,8 @@ public class Controlador implements Runnable{
 		return avions;
 	}
 	
-	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, Finger finger){
-		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegueOest);
+	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
+		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
 		avions.add(avio);
 		avio.start();
 	}

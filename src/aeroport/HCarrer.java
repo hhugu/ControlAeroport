@@ -20,7 +20,7 @@ public class HCarrer extends Carrer {
 
 	@Override
 	public void addCrossRoad(CrossRoad cr) {
-		crossRoads.add(cr);
+		crossroads.add(cr);
 	}
 	
 	@Override
@@ -62,7 +62,7 @@ public class HCarrer extends Carrer {
 
 		inFrontCR = null;
 		minDistance = this.getCmLong() + 1;
-		itr = this.crossRoads.iterator();
+		itr = this.crossroads.iterator();
 		while (itr.hasNext()) {
 			actualCR = itr.next();
 
@@ -97,7 +97,7 @@ public class HCarrer extends Carrer {
 		int cmPosX;
 
 		cmPosX = this.getCmPosX(cmPosition, Direction.FORWARD);
-		Iterator<CrossRoad> itr = this.crossRoads.iterator();
+		Iterator<CrossRoad> itr = this.crossroads.iterator();
 		while (itr.hasNext()) {
 			cr = itr.next();
 
