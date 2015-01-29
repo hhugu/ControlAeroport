@@ -70,17 +70,7 @@ public class Avio extends Thread {
 				
 				if(cmPosition < -5000 || cmPosition > way.getCmLong()+5000) fin = true;
 				
-				if(way instanceof Finger && cmPosition>=way.cmLong){
-					try {
-						controlador.canviarEstatFinger(finger, Estat.ocupat);
-						Thread.sleep(5000);
-						estat = EstatAvio.GOPISTA;
-						controlador.canviarEstatFinger(finger, Estat.buit);
-						posicio = 0;
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+				
 			}
 		}
 	}
