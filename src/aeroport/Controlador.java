@@ -45,39 +45,12 @@ public class Controlador implements Runnable{
 			
 		}
 	}
-	
-	private ArrayList<String> triarRutaAlFinger(int vent) {
-		switch(vent){
-		case 0: return rutaAlFingerEst;
-		case 1: return rutaAlFingerOest;
-		}
-		return null;
-	}
-	
-	private ArrayList<String> triarRutaDespegue(int vent) {
-		switch(vent){
-		case 0: return rutaDespegueEst;
-		case 1: return rutaDespegueOest;
-		}
-		return null;
-	}
 
-	private synchronized Finger afegirFingerARuta(ArrayList<String> ruta) {
-		Finger finger = getPrimerFingerBuit();
-		while(finger == null){
-			try {
-				finger = getPrimerFingerBuit();
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		ruta.add((finger.idWay));
-
-		return finger;
-	}
-
+	/*
+	 * RUTES
+	 */
 	private void crearRutes(){
+		//Ruta Oest: Aterra i despega enrrera
 		rutaAlFingerOest = new ArrayList<String>();
 		rutaAlFingerOest.add(("iniciPista"));
 		rutaAlFingerOest.add(("h1"));
@@ -88,7 +61,7 @@ public class Controlador implements Runnable{
 		rutaDespegueOest.add(("goFingers"));
 		rutaDespegueOest.add(("fiPista"));
 		rutaDespegueOest.add(("pista"));
-		
+		//Ruta Est: Aterra i despega envant
 		rutaAlFingerEst = new ArrayList<String>();
 		rutaAlFingerEst.add("fiPista");
 		rutaAlFingerEst.add("h2");
@@ -105,7 +78,41 @@ public class Controlador implements Runnable{
 		rutaDespegueEst.add(("pista"));
 		
 	}
+	
+	private Finger afegirFingerARuta(ArrayList<String> ruta) {
+		Finger finger = getPrimerFingerBuit();
+		while(finger == null){
+			try {
+				finger = getPrimerFingerBuit();
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		ruta.add((finger.idWay));
 
+		return finger;
+	}
+	
+	private ArrayList<String> triarRutaAlFinger(int vent) {
+		switch(vent){
+		case 0: return rutaAlFingerEst;
+		case 1: return rutaAlFingerOest;
+		}
+		return null;
+	}
+	
+	private ArrayList<String> triarRutaDespegue(int vent) {
+		switch(vent){
+		case 0: return rutaDespegueEst;
+		case 1: return rutaDespegueOest;
+		}
+		return null;
+	}
+	
+	/*
+	 * AVIONS
+	 */
 	public ArrayList<Avio> getAvions(){
 		return avions;
 	}
@@ -115,7 +122,20 @@ public class Controlador implements Runnable{
 		avions.add(avio);
 		avio.start();
 	}
-
+	
+	public void paintAvions(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
+		for(int i=0; i < avions.size(); i++){
+			avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
+		}
+	}
+	
+	public void borrarAvio(Avio avio){
+		avions.remove(avio);
+	}
+	
+	/*
+	 * FINGERS
+	 */
 	private Finger getPrimerFingerBuit(){
 		Finger finger;
 		for (int i = 0; i < fingers.size(); i++) {
@@ -136,9 +156,14 @@ public class Controlador implements Runnable{
 		}
 	}
 	
-	public void paintAvions(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
-		for(int i=0; i < avions.size(); i++){
-			avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
-		}
+	/*
+	 * VENT
+	 */
+	public Direction direccioDespegue(){
+		//oest enrrera
+		if(mapa.getVent() == 0) return Direction.FORWARD;
+		else if(mapa.getVent() == 1) return Direction.BACKWARD;
+		
+		return null;
 	}
 }

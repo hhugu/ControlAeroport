@@ -68,7 +68,7 @@ public class Avio extends Thread {
 				if(cmPosition >= way.getCmLong() && estat != EstatAvio.DESPEGANT) this.direction = Direction.BACKWARD;
 				if(cmPosition <= 0 && estat != EstatAvio.DESPEGANT) this.direction = Direction.FORWARD;
 				
-				if(cmPosition < -5000 || cmPosition > way.getCmLong()+5000) fin = true;
+				if(cmPosition < -5000 || cmPosition > way.getCmLong()+5000) controlador.borrarAvio(this);
 				
 				if(way instanceof Finger && (cmPosition + this.cmLong) >=way.cmLong){
 					int temp = cmPosition;
@@ -82,7 +82,6 @@ public class Avio extends Thread {
 						estat = EstatAvio.GOPISTA;
 						controlador.canviarEstatFinger(finger, Estat.buit);
 						posicio = 0;
-						System.out.println("dfkh");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -146,6 +145,9 @@ public class Avio extends Thread {
 				}
 			}
 		}
+    	if(way.getId().equals("pista") && estat == EstatAvio.DESPEGANT){
+    		direction = controlador.direccioDespegue();
+    	}
 	
 	}
     

@@ -330,8 +330,8 @@ public class Mapa extends Canvas implements Runnable {
         finX = (int)((4000 / factorX));
         finY = (int)((4000 / factorY));  
        
-        if(vent == 0) g.drawImage(imgVent, iniX, iniY, finX, finY, this);
-		else if(vent ==1) g.drawImage(imgVent, iniX, iniY, -finX, finY, this);
+        if(vent == 0) g.drawImage(imgVent, iniX, iniY, -finX, finY, this);
+		else if(vent ==1) g.drawImage(imgVent, iniX, iniY, finX, finY, this);
     	
     }
     
