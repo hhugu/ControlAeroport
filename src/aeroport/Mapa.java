@@ -225,13 +225,10 @@ public class Mapa extends Canvas implements Runnable {
         while (!Aeroport.isEnd()) {
         	if(!Aeroport.isPaused()){
 	            this.paint();
-	
-	            do {
-	                try {
-	                    Thread.sleep(7); // nano -> ms
-	                } catch (InterruptedException ex) {
-	                }
-	            } while (Aeroport.isPaused());
+                try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+				}
         	}
         }
     }

@@ -237,7 +237,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 			this.showStatistics();
 			
             try {
-                Thread.sleep(800);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
         }

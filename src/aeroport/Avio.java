@@ -35,7 +35,7 @@ public class Avio extends Thread {
 		}
         cmLong = 1000;
         cmWidth = 1000;
-        speed = 5;
+        speed = 50;
         
         this.finger = finger;
         this.rutaAlFinger = rutaAlFinger;
@@ -59,7 +59,7 @@ public class Avio extends Thread {
 		while(!fin){
 			if (!Aeroport.isPaused()) {
 				try {
-					Thread.sleep(2);
+					Thread.sleep(20);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -108,7 +108,7 @@ public class Avio extends Thread {
 			
 			while(cmPosition <= 0){
 				cmPosition+=speed;
-				Thread.sleep(2);
+				Thread.sleep(20);
 			}
 		}
 	}

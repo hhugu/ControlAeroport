@@ -37,7 +37,7 @@ public class Controlador implements Runnable{
 				try {
 					addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
 					rutaAlFinger.remove(rutaAlFinger.size()-1);
-					Thread.sleep(5000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -79,7 +79,7 @@ public class Controlador implements Runnable{
 		
 	}
 	
-	private Finger afegirFingerARuta(ArrayList<String> ruta) {
+	private synchronized Finger afegirFingerARuta(ArrayList<String> ruta) {
 		Finger finger = getPrimerFingerBuit();
 		while(finger == null){
 			try {
@@ -154,6 +154,7 @@ public class Controlador implements Runnable{
 				fingers.get(i).setEstat(estat);
 			}
 		}
+		//if(estat.equals(Estat.buit)
 	}
 	
 	/*
