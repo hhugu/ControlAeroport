@@ -48,7 +48,9 @@ public class Avio extends Thread {
     }
 	
 	public void run(){
-		cmPosition = way.getEntryPoint(getDirection());
+		estat = EstatAvio.ATERRANT;
+		aterrar();
+//		cmPosition = way.getEntryPoint(getDirection());
 		estat = EstatAvio.GOFINGER;
 		boolean fin = false;
 		while(!fin){
@@ -77,7 +79,7 @@ public class Avio extends Thread {
 					
 					try {
 						controlador.canviarEstatFinger(finger, Estat.ocupat);
-						Thread.sleep(5000);
+						Thread.sleep(6500);
 						cmPosition = temp;
 						estat = EstatAvio.GOPISTA;
 						controlador.canviarEstatFinger(finger, Estat.buit);
@@ -89,6 +91,21 @@ public class Avio extends Thread {
 			}
 		}
 	}
+	private void aterrar() {
+		if (direction == Direction.BACKWARD) {
+			cmPosition = way.getEntryPoint(direction)+5000;
+			while(cmPosition > way.cmLong){
+				cmPosition -= speed;
+			}
+		}else if(direction == Direction.FORWARD){
+			cmPosition = -5000;
+			while(cmPosition > way.cmLong){
+				cmPosition += speed;
+			}
+		}
+		
+	}
+
 	public synchronized void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
 		int iniX, iniY, finX, finY;
 		
@@ -178,64 +195,6 @@ public class Avio extends Thread {
         }
     }
     
-    public static enum Orientation {
-    	
-        NORTH(Direction.BACKWARD),
-        SOUDTH(Direction.FORWARD),
-        WEST(Direction.BACKWARD),
-        EAST(Direction.FORWARD);
-        Direction direction;
-
-        private Orientation(Direction direction) {
-            this.direction = direction;
-        }
-
-        public static Direction getDirection(Orientation orientation) {
-            if ((orientation == Orientation.SOUDTH) || (orientation == Orientation.EAST)) {
-                return Direction.FORWARD;  
-            }
-            return Direction.BACKWARD;
-        }
-
-        public static Orientation getOrientation(Avio avio) {
-            return getOrientation(avio.getWay(), avio.getDirection());
-        }
-
-        public static Orientation getOrientation(Carrer way, Direction direction) {
-            if (way instanceof VCarrer) {
-                if (direction == Direction.FORWARD) {
-                    return Orientation.SOUDTH; 
-                } else {
-                    return Orientation.NORTH; 
-                }
-            }
-
-            if (way instanceof HCarrer) {
-                if (direction == Direction.FORWARD) {
-                    return Orientation.EAST; 
-                } else {
-                    return Orientation.WEST; 
-                }
-            }
-
-            return Orientation.WEST;
-        }
-
-        public static int getDegrees(Orientation orientation) {
-            switch (orientation) {
-                case NORTH:
-                    return 0;
-                case EAST:
-                    return 90;
-                case SOUDTH:
-                    return 180;
-                case WEST:
-                    return 270;
-            }
-
-            return 0;
-        }
-    }
     public Direction getDirection() {
 		return direction;
 	}
