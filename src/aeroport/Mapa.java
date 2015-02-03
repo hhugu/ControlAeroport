@@ -17,7 +17,7 @@ import aeroport.Avio.Direction;
 
 public class Mapa extends Canvas implements Runnable {
 
-	private static final long serialVersionUID = 4571448590220527937L;
+	private static final long serialVersionUID = 1L;
 	private int cityCmWidth;
     private int cityCmHeight;
     private int mapWidth;
@@ -55,7 +55,7 @@ public class Mapa extends Canvas implements Runnable {
         this.cmHCarrerWidth = cmVCarrerWidth+200;
         this.cmCarrerMark = 300; // Longitud marcas viales en cm
         
-        goFingers=new HCarrer("goFingers",this.cmHCarrerWidth, this.cmCarrerMark, 12000, 11000, 9000, Direction.FORWARD);
+        goFingers=new HCarrer("goFingers",this.cmHCarrerWidth, this.cmCarrerMark, 12000, 11000, 9000);
         
         this.carrers = new ArrayList<Carrer>();
         this.crossroads = new ArrayList<CrossRoad>();
@@ -287,20 +287,20 @@ public class Mapa extends Canvas implements Runnable {
     
     private void loadCarrers() {
     	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY , Direction
-    	carrers.add(new HCarrer("pista", cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500, null));
-    	carrers.add(new HCarrer("h2", cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500, null));
-    	carrers.add(new VCarrer("iniciPista", cmVCarrerWidth, cmCarrerMark, 6000, 5000, 500, Direction.FORWARD));
-        carrers.add(new VCarrer("fiPista", cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500, Direction.BACKWARD));
-        carrers.add(new HCarrer("h1", cmHCarrerWidth, cmCarrerMark, 6090, 5000, 6500, Direction.FORWARD));
+    	carrers.add(new HCarrer("pista", cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500));
+    	carrers.add(new HCarrer("h2", cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500));
+    	carrers.add(new VCarrer("iniciPista", cmVCarrerWidth, cmCarrerMark, 6000, 5000, 500));
+        carrers.add(new VCarrer("fiPista", cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500));
+        carrers.add(new HCarrer("h1", cmHCarrerWidth, cmCarrerMark, 6090, 5000, 6500));
         carrers.add(goFingers);
-        carrers.add(new VCarrer("v1", cmVCarrerWidth, cmCarrerMark, 3000, 11000, 6500, Direction.FORWARD));
+        carrers.add(new VCarrer("v1", cmVCarrerWidth, cmCarrerMark, 3000, 11000, 6500));
     }
     
     private void loadFingers(){
     	// int id, int pos x, int pos y, estat
     	int posx=12000;
     	for (int i = 0; i < 7 ; i++) {
-			this.fingers.add(new Finger("finger"+i+"", 1000, this.cmCarrerMark, 2500, posx, 9000, Direction.FORWARD));
+			this.fingers.add(new Finger("finger"+i+"", 1000, this.cmCarrerMark, 2500, posx, 9000));
 			posx+=1500;
 		}
     }

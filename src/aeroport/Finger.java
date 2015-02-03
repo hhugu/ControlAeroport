@@ -13,8 +13,8 @@ public class Finger extends Carrer {
 	public enum Estat {ocupat, buit, reservat};
 	
 	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY	
-	public Finger(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY, Direction direccio) {
-		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY, direccio);
+	public Finger(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
+		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
         this.cmFinX = this.cmIniX + this.cmWidth;
         this.cmFinY = this.cmIniY + this.cmLong;
         

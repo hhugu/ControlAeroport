@@ -10,9 +10,9 @@ import aeroport.Avio.Direction;
 
 public class VCarrer extends Carrer {
 
-	public VCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong,	int cmPosIniX, int cmPosIniY, Direction direccio) {
+	public VCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong,	int cmPosIniX, int cmPosIniY) {
 
-		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY, direccio);
+		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
 
 		this.cmFinX = this.cmIniX + this.cmWidth;
 		this.cmFinY = this.cmIniY + this.cmLong;

@@ -49,8 +49,11 @@ public class Avio extends Thread {
 	
 	public void run(){
 		estat = EstatAvio.ATERRANT;
-		aterrar();
-//		cmPosition = way.getEntryPoint(getDirection());
+		try {
+			aterrar();
+		} catch (InterruptedException e1) {
+		}
+		
 		estat = EstatAvio.GOFINGER;
 		boolean fin = false;
 		while(!fin){
@@ -91,19 +94,23 @@ public class Avio extends Thread {
 			}
 		}
 	}
-	private void aterrar() {
+	
+	private void aterrar() throws InterruptedException {
 		if (direction == Direction.BACKWARD) {
-			cmPosition = way.getEntryPoint(direction)+5000;
-			while(cmPosition > way.cmLong){
-				cmPosition -= speed;
+			cmPosition = way.getCmLong()+5000;
+			
+			while(cmPosition >= way.getCmLong()){
+				cmPosition-=speed;
+				Thread.sleep(2);
 			}
 		}else if(direction == Direction.FORWARD){
 			cmPosition = -5000;
-			while(cmPosition > way.cmLong){
-				cmPosition += speed;
+			
+			while(cmPosition <= 0){
+				cmPosition+=speed;
+				Thread.sleep(2);
 			}
 		}
-		
 	}
 
 	public synchronized void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {

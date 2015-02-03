@@ -16,21 +16,19 @@ public abstract class Carrer {
     protected int cmFinY;
     protected int cmWidth;
     protected int cmMark;
-    protected Direction direccio;
     protected ArrayList<Avio> avions = new ArrayList<Avio>();
     protected ArrayList<CrossRoad> crossroads = new ArrayList<CrossRoad>();
     protected ArrayList<Integer> forwardEntryPoint = new ArrayList<Integer>();
     protected ArrayList<Integer> backwardEntryPoint = new ArrayList<Integer>();
 
-    public Carrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY, Direction direccio) {
+    public Carrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
         this.idWay = idWay;
         this.cmLong = cmLong;
         this.cmWidth = cmWayWidth;
         this.cmMark = cmWayMark;
         this.cmIniX = cmPosIniX;
         this.cmIniY = cmPosIniY;
-        this.direccio = direccio;
-
+        
         this.createDefaultEntryPoints();
     }
     

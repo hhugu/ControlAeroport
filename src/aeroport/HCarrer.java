@@ -11,8 +11,8 @@ import aeroport.Avio.Direction;
 
 public class HCarrer extends Carrer {
 
-	public HCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY, Direction direccio) {
-        super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY, direccio);
+	public HCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
+        super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
 
         this.cmFinX = this.cmIniX + this.cmLong;
         this.cmFinY = this.cmIniY + this.cmWidth;
