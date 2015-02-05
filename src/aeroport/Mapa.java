@@ -13,8 +13,6 @@ import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 
-import aeroport.Avio.Direction;
-
 public class Mapa extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
@@ -22,43 +20,41 @@ public class Mapa extends Canvas implements Runnable {
     private int cityCmHeight;
     private int mapWidth;
     private int mapHeigth;
-    private float factorX;
-    private float factorY;
+    private float factorX, factorY;
     private float zoomLevel;
-    private int offsetX;
-    private int offsetY;
-    private int cmVCarrerWidth, cmHCarrerWidth;
-    private int cmCarrerMark;
-    private BufferedImage imgMap, fondo, aeroport, imgVent;
-    private Controlador controlador;
+    private int offsetX, offsetY;
+    private int cmVCarrerWidth, cmHCarrerWidth, cmCarrerMark;
+    private BufferedImage imgMap, imgFondo, imgAeroport, imgVent;
+    private Aeroport aeroport;
     private ArrayList<Carrer> carrers;
     private ArrayList<CrossRoad> crossroads;
     private ArrayList<Finger> fingers;
     private HCarrer goFingers;
     private int vent;
 
-    public Mapa(int cityCmWidth, int cityCmHeight, int mapPixWidth, int mapPixHeight) {
+    public Mapa(int cityCmWidth, int cityCmHeight, int mapPixWidth, int mapPixHeight, Aeroport aeroport) {
     	
     	vent = ((int) (Math.random()*2));
-    	System.out.println(vent);
+    	
+    	this.aeroport = aeroport;
         this.cityCmWidth = cityCmWidth;
         this.cityCmHeight = cityCmHeight;
-        this.mapWidth = mapPixWidth;
-        this.mapHeigth = mapPixHeight;
+        mapWidth = mapPixWidth;
+        mapHeigth = mapPixHeight;
       
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.zoomLevel = 2;
-        this.setFactorXY();
+        offsetX = 0;
+        offsetY = 0;
+        zoomLevel = 2;
+        setFactorXY();
 
-        this.cmVCarrerWidth = 800;
-        this.cmHCarrerWidth = cmVCarrerWidth+200;
-        this.cmCarrerMark = 300; // Longitud marcas viales en cm
+        cmVCarrerWidth = 800;
+        cmHCarrerWidth = cmVCarrerWidth+200;
+        cmCarrerMark = 300;
         
         goFingers=new HCarrer("goFingers",this.cmHCarrerWidth, this.cmCarrerMark, 12000, 11000, 9000);
         
-        this.carrers = new ArrayList<Carrer>();
-        this.crossroads = new ArrayList<CrossRoad>();
+        carrers = new ArrayList<Carrer>();
+        crossroads = new ArrayList<CrossRoad>();
        
         this.loadCarrers();
         
@@ -66,16 +62,16 @@ public class Mapa extends Canvas implements Runnable {
          *     *	*	*	*
  */
         Dimension d = new Dimension(1336, 520);
-        this.setPreferredSize(d);
+        setPreferredSize(d);
         
-        this.fingers= new ArrayList<Finger>();
-        this.loadFingers();
+        fingers= new ArrayList<Finger>();
+        loadFingers();
         
-        this.calculateCrossRoads();
+        calculateCrossRoads();
         
         try {
-            this.fondo = ImageIO.read(new File("Imagenes/fondo.png"));
-            this.aeroport = ImageIO.read(new File("Imagenes/terminal.png"));
+            this.imgFondo = ImageIO.read(new File("Imagenes/fondo.png"));
+            this.imgAeroport = ImageIO.read(new File("Imagenes/terminal.png"));
             this.imgVent = ImageIO.read(new File("Imagenes/viento.png"));
         } catch (IOException e) {
             System.out.println("Img Error: not found");
@@ -200,7 +196,7 @@ public class Mapa extends Canvas implements Runnable {
          finY = (int)((20000 / factorY));  
          
 
-        g.drawImage(fondo, iniX, iniY, finX, finY, null);
+        g.drawImage(imgFondo, iniX, iniY, finX, finY, null);
     }
 
     public void paintCrossRoads(Graphics g) {
@@ -286,9 +282,9 @@ public class Mapa extends Canvas implements Runnable {
     	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY , Direction
     	carrers.add(new HCarrer("pista", cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500));
     	carrers.add(new HCarrer("h2", cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500));
-    	carrers.add(new VCarrer("iniciPista", cmVCarrerWidth, cmCarrerMark, 6000, 5000, 500));
+    	carrers.add(new VCarrer("iniciPista", cmVCarrerWidth, cmCarrerMark, 6100, 5000, 500));
         carrers.add(new VCarrer("fiPista", cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500));
-        carrers.add(new HCarrer("h1", cmHCarrerWidth, cmCarrerMark, 6090, 5000, 6500));
+        carrers.add(new HCarrer("h1", cmHCarrerWidth, cmCarrerMark, 6100, 5000, 6500));
         carrers.add(goFingers);
         carrers.add(new VCarrer("v1", cmVCarrerWidth, cmCarrerMark, 3000, 11000, 6500));
     }
@@ -316,7 +312,7 @@ public class Mapa extends Canvas implements Runnable {
         finX = (int)((15000 / factorX));
         finY = (int)((7000 / factorY));  
        
-    	g.drawImage(aeroport, iniX, iniY, finX, finY, this);
+    	g.drawImage(imgAeroport, iniX, iniY, finX, finY, this);
     }
     
     public void paintVent(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
@@ -333,12 +329,8 @@ public class Mapa extends Canvas implements Runnable {
     }
     
     private void paintAvions(Graphics g){
-    	controlador.paintAvions(g, factorX, factorY, offsetX, offsetY);
+    	aeroport.paintAvions(g, factorX, factorY, offsetX, offsetY);
     }
-
-	public void setControlador(Controlador traffic) {
-		controlador=traffic;
-	}
 
 	public int getVent() {
 		return vent;

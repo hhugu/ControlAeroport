@@ -1,5 +1,7 @@
 package aeroport;
+
 import java.awt.Container;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,83 +10,98 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import aeroport.Avio.Direction;
+import aeroport.Finger.Estat;
+
 
 public class Aeroport extends JFrame implements Runnable, MouseWheelListener, ActionListener, ComponentListener {
 	
-	private static final long serialVersionUID = 1864146382345156552L;
+    public static void main(String[] args) {Aeroport ciutat = new Aeroport();}
+    
+   private static final long serialVersionUID = 1864146382345156552L;
 	public static final int CIUTAT_CM_WIDTH = 60000; // Amplada ciutat
     public static final int CIUTAT_CM_HEIGHT = 34500; // Al�ada ciutat
-    public static final int FRAME_PIX_WIDTH = 1350; // Amplada window
-    public static final int FRAME_PIX_HEIGHT = 750;  // Al�ada window 
+    public static final int FRAME_PIX_WIDTH = 1080; // Amplada window
+    public static final int FRAME_PIX_HEIGHT = 620;  // Al�ada window 
     public static final int MAPA_PIX_WIDTH = 1080; // Amplada window
     public static final int MAPA_PIX_HEIGH = 620;  // Al�ada window 
-    private JButton bUp, bDown, bLeft, bRight, bZoomPlus, bZoomMinus, pause, start;
-    //private JButton bBottomFill1, bBottomFill2;
-    private Mapa map;
-    private Controlador traffic;
+	private static final int MAX_AVIONS = 10;
+	public static final int SLEEP_TIME = 30;
+	public static final int VELOCITAT_SEGURITAT = 50, VELOCITAT_DE_VOL = 460; 
+
+
     private static volatile boolean pauseCity;
     private static volatile boolean endCity;
-
+        
+    private ArrayList <Avio> avions = new ArrayList<Avio>();
+	private ArrayList <Carrer> carrers;
+	private ArrayList <Finger> fingers;
+	private ArrayList <String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
+    
+    private Mapa mapa;
+    
     public Aeroport() {
-    	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    	setDefaultCloseOperation(EXIT_ON_CLOSE);
     	
-        this.map = new Mapa(Aeroport.CIUTAT_CM_WIDTH, Aeroport.CIUTAT_CM_HEIGHT, Aeroport.MAPA_PIX_WIDTH, Aeroport.MAPA_PIX_HEIGH);
+        mapa = new Mapa(Aeroport.CIUTAT_CM_WIDTH, Aeroport.CIUTAT_CM_HEIGHT, Aeroport.MAPA_PIX_WIDTH, Aeroport.MAPA_PIX_HEIGH, this);
+        
+        carrers = mapa.getCarrers();
+        fingers = mapa.getFingers();
+        
+        createFrame();
+        crearRutes();
 
-        this.createFrame();
-        this.traffic = new Controlador(this.map.getCarrers(), this.map.getFingers(), this.map);
-        this.map.setControlador(this.traffic);
-
-        new Thread(this.map).start();
-        new Thread(this.traffic).start();
-        this.play(); // Arracar el simul·lador
-
+        new Thread(mapa).start();
         new Thread(this).start();
     }
+    
+    /*
+     * CARREGAR PART GRAFICA
+     */
+    
+    private void createFrame() {
+        Container panel;
+        
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new GridBagLayout());
 
-    public static void main(String[] args) {
-        Aeroport ciutat = new Aeroport();
-        ciutat.play();
+        panel = getContentPane();
+        addMapToPane(panel);
+        addButtonsToPane(panel);
+       
+        panel.addMouseWheelListener(this);
+        
+        pack();
+        setVisible(true);
+
+        addComponentListener(this);
     }
-
-    public static int getCmWidth() {
-        return Aeroport.CIUTAT_CM_WIDTH;
-    }
-
-    public static int getCmHeight() {
-        return Aeroport.CIUTAT_CM_HEIGHT;
-    }
-
-    public static int getFramePixWidth() {
-        return Aeroport.FRAME_PIX_WIDTH;
-    }
-
-    public static int getFramePixHeight() {
-        return Aeroport.FRAME_PIX_HEIGHT;
-    }
-
     
     private void addButtonsToPane(Container pane) {
-        this.bUp = new JButton("Up");
-        this.bDown = new JButton("Down");
-        this.bLeft = new JButton("<");
-        this.bRight = new JButton(">");
-        this.bZoomPlus = new JButton("Z+");
-        this.bZoomMinus = new JButton("Z-");
-        this.pause = new JButton("Pause");
-        this.start = new JButton("Start");
+    	JButton bUp = new JButton("Up");
+    	JButton bDown = new JButton("Down");
+    	JButton bLeft = new JButton("<");
+    	JButton bRight = new JButton(">");
+    	JButton bZoomPlus = new JButton("Z+");
+    	JButton bZoomMinus = new JButton("Z-");
+    	JButton pause = new JButton("Pause");
+        JButton start = new JButton("Start");
+        JButton end = new JButton("End");
 
-        this.bUp.addActionListener(this);
-        this.bDown.addActionListener(this);
-        this.bLeft.addActionListener(this);
-        this.bRight.addActionListener(this);
-        this.bZoomPlus.addActionListener(this);
-        this.bZoomMinus.addActionListener(this);
-        this.pause.addActionListener(this);
-        this.start.addActionListener(this);
+        bUp.addActionListener(this);
+        bDown.addActionListener(this);
+        bLeft.addActionListener(this);
+        bRight.addActionListener(this);
+        bZoomPlus.addActionListener(this);
+        bZoomMinus.addActionListener(this);
+        pause.addActionListener(this);
+        start.addActionListener(this);
+        end.addActionListener(this);
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -93,28 +110,32 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         c.weighty = 0;
         c.gridx = 1;
         c.gridy = 10;
-        pane.add(this.bUp, c);
+        
+        pane.add(bUp, c);
 
         c.gridx++;
-        pane.add(this.bDown, c);
+        pane.add(bDown, c);
 
         c.gridx++;
-        pane.add(this.bLeft, c);
+        pane.add(bLeft, c);
 
         c.gridx++;
-        pane.add(this.bRight, c);
+        pane.add(bRight, c);
 
         c.gridx++;
-        pane.add(this.bZoomPlus, c);
+        pane.add(bZoomPlus, c);
 
         c.gridx++;
-        pane.add(this.bZoomMinus, c);
+        pane.add(bZoomMinus, c);
         
         c.gridx++;
-        pane.add(this.pause, c);
+        pane.add(pause, c);
         
         c.gridx++;
-        pane.add(this.start, c);
+        pane.add(start, c);
+        
+        c.gridx++;
+        pane.add(end, c);
     }
 
     private void addMapToPane(Container pane) {
@@ -128,75 +149,46 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         c.weighty = 0;
         c.gridheight = 10;
         c.gridwidth = 8;
-        pane.add(this.map, c);
-    }
-
-    private void createFrame() {
-        Container panel;
         
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new GridBagLayout());
-
-        panel = this.getContentPane();
-        this.addMapToPane(panel);
-        this.addButtonsToPane(panel);
-       
-        panel.addMouseWheelListener(this);
-        
-        this.pack();
-        this.setVisible(true);
-
-        addComponentListener(this);
-    }
-
-    public static boolean isEnd() {
-        return Aeroport.endCity;
-    }
-
-    public static boolean isPaused() {
-        return Aeroport.pauseCity;
-    }
-
-    public void play() {
-        // Iniciar el rellotge
-        // Engegar el generador de trafic
-        Aeroport.pauseCity = false;
-        Aeroport.endCity = false;
-    }
-
-    public void pause() {
-        // Aturar el rellotge
-        // Aturar el generador de trafic
-        // Bloquejar el vehicles
-
-        Aeroport.pauseCity = true;
-    }
-
-    private void showStatistics() {
+        pane.add(this.mapa, c);
     }
     
+    /*
+     * CAPTURACIO D'EVENTS
+     */
     
     @Override
     public void actionPerformed(ActionEvent e) {
         String str = e.getActionCommand();
 
         switch(str){
-        case "Z+": this.map.zoomIn(0.1f); break;
-        case "Z-": this.map.zoomOut(0.1f); break;
-        case "Up": this.map.moveDown(); break;
-        case "Down": this.map.moveUp(); break;
-        case "<": this.map.moveRight(); break;
-        case ">": this.map.moveLeft(); break;
-        case "Pause": Aeroport.pauseCity = true; break;
-        case "Start": Aeroport.pauseCity = false; break;
+	        case "Z+": this.mapa.zoomIn(0.1f); break;
+	        case "Z-": this.mapa.zoomOut(0.1f); break;
+	        case "Up": this.mapa.moveDown(); break;
+	        case "Down": this.mapa.moveUp(); break;
+	        case "<": this.mapa.moveRight(); break;
+	        case ">": this.mapa.moveLeft(); break;
+	        case "Pause": Aeroport.pauseCity = true; break;
+	        case "Start": Aeroport.pauseCity = false; break;
+	        case "End": Aeroport.endCity = true; break;
         }
     }
     
     @Override
     public void componentResized(ComponentEvent e) {
-        this.map.setFactorXY();
+        this.mapa.setFactorXY();
     }
 
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int notches = e.getWheelRotation();
+        if (notches < 0) {
+            this.mapa.zoomIn();
+        } else {
+            this.mapa.zoomOut();
+        }
+    }
+    
     @Override
     public void componentMoved(ComponentEvent e) {
     }
@@ -209,38 +201,183 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
     public void componentHidden(ComponentEvent e) {
     }
 
+	/*
+	 * RUTES
+	 */
     
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        int notches = e.getWheelRotation();
-        if (notches < 0) {
-            this.map.zoomIn();
-        } else {
-            this.map.zoomOut();
+	private void crearRutes(){
+		//Ruta Oest: Aterra i despega enrrera
+		rutaAlFingerOest = new ArrayList<String>();
+		rutaAlFingerOest.add(("iniciPista"));
+		rutaAlFingerOest.add(("h1"));
+		rutaAlFingerOest.add(("v1"));
+		rutaAlFingerOest.add(("goFingers"));
+		
+		rutaDespegueOest = new ArrayList<String>();
+		rutaDespegueOest.add(("goFingers"));
+		rutaDespegueOest.add(("fiPista"));
+		rutaDespegueOest.add(("pista"));
+		
+		//Ruta Est: Aterra i despega envant
+		rutaAlFingerEst = new ArrayList<String>();
+		rutaAlFingerEst.add("fiPista");
+		rutaAlFingerEst.add("h2");
+		rutaAlFingerEst.add("iniciPista");
+		rutaAlFingerEst.add(("h1"));
+		rutaAlFingerEst.add(("v1"));
+		rutaAlFingerEst.add(("goFingers"));
+		
+		rutaDespegueEst = new ArrayList<String>();
+		rutaDespegueEst.add(("goFingers"));
+		rutaDespegueEst.add(("fiPista"));
+		rutaDespegueEst.add("h2");
+		rutaDespegueEst.add("iniciPista");
+		rutaDespegueEst.add(("pista"));
+		
+	}
+	
+	private synchronized Finger afegirFingerARuta(ArrayList<String> ruta) {
+		Finger finger;
+		while(!hiHaUnQualqueFinguerBuit()){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		finger = getPrimerFingerBuit();
+		ruta.add(finger.idWay);
+
+		return finger;
+	}
+
+	private ArrayList<String> triarRutaAlFinger(int vent) {
+		switch(vent){
+		case 0: return rutaAlFingerEst;
+		case 1: return rutaAlFingerOest;
+		}
+		return null;
+	}
+	
+	private ArrayList<String> triarRutaDespegue(int vent) {
+		switch(vent){
+		case 0: return rutaDespegueEst;
+		case 1: return rutaDespegueOest;
+		}
+		return null;
+	}
+	
+	/*
+	 * AVIONS
+	 */
+	
+	public ArrayList<Avio> getAvions(){
+		return avions;
+	}
+	
+	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
+		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
+		avions.add(avio);
+		avio.start();
+	}
+	
+	public void paintAvions(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
+		for(int i=0; i < avions.size(); i++){
+			avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
+		}
+	}
+	
+	public void borrarAvio(Avio avio){
+		avions.remove(avio);
+	}
+	
+	/*
+	 * FINGERS
+	 */
+	
+	private Finger getPrimerFingerBuit(){
+		Finger finger;
+		for (int i = 0; i < fingers.size(); i++) {
+			finger = fingers.get(i);
+			if (finger.estaDisponible()) {
+				this.canviarEstatFinger(finger, Estat.reservat);
+				return fingers.get(i);
+			}
+		}
+		return null;
+	}
+	
+	private boolean hiHaUnQualqueFinguerBuit() {
+		for (int i = 0; i < fingers.size(); i++) {
+			if (fingers.get(i).estaDisponible()) {
+				return true;
+			}
+		}		
+		return false;
+	}
+	
+	public synchronized void canviarEstatFinger(Finger finger, Estat estat){
+		for (int i = 0; i < fingers.size(); i++) {
+			if (fingers.get(i).equals(finger)) {
+				fingers.get(i).setEstat(estat);
+			}
+		}
+		if(estat.equals(Estat.buit)) notify();
+	}
+	
+	/*
+	 * VENT
+	 */
+	public Direction direccioDespegue(){
+		if(mapa.getVent() == 0) return Direction.FORWARD;
+		else if(mapa.getVent() == 1) return Direction.BACKWARD;
+		
+		return null;
+	}
+    
+    @SuppressWarnings("unchecked")
+    public void run() {
+    	Direction direccio = null;
+        int i = 0, vent;
+        
+        while (!Aeroport.isEnd()) {
+            if (!Aeroport.isPaused() && avions.size() < MAX_AVIONS) {
+            	vent = mapa.getVent();
+        		if(vent == 0) direccio = Direction.FORWARD;
+        		else if(vent ==1) direccio = Direction.BACKWARD;
+        				
+        		ArrayList<String> rutaAlFinger = triarRutaAlFinger(vent);
+        		ArrayList<String> rutaDespegue = triarRutaDespegue(vent);
+        		Finger finger = afegirFingerARuta(rutaAlFinger);
+        			
+        		try {
+        			addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
+        			rutaAlFinger.remove(rutaAlFinger.size()-1);
+        			Thread.sleep(2000);
+        		} catch (InterruptedException e) {
+        			e.printStackTrace();
+        		}
+        		i++;
+            }
         }
+        finalitzar();
     }
 
-  
-  
-    @Override
-    public void run() {
-        while (!Aeroport.isEnd()) {
-            if (Aeroport.isPaused()) {
-//                try {
-//					this.map.wait();
-//					this.traffic.wait();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}  
-            }
-            
-			this.showStatistics();
-			
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-            }
-        }
+    private void finalitzar() {
+    	try {
+	        avions.removeAll(avions);
+	        mapa.paint();
+			Thread.sleep(100);
+			this.dispose();
+    	} catch (InterruptedException e) {
+		}
+	}
 
+	public static boolean isPaused() {
+        return Aeroport.pauseCity;
+    }
+    
+    public static boolean isEnd() {
+        return Aeroport.endCity;
     }
 }
