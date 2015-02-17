@@ -11,8 +11,8 @@ import aeroport.Avio.Direction;
 
 public class HCarrer extends Carrer {
 
-	public HCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
-        super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
+	public HCarrer(String idWay, int numAvions, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
+        super(idWay, numAvions, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
 
         this.cmFinX = this.cmIniX + this.cmLong;
         this.cmFinY = this.cmIniY + this.cmWidth;
@@ -53,35 +53,6 @@ public class HCarrer extends Carrer {
 	}
 
 	@Override
-	public CrossRoad inFrontCrossRoad(Avio avio) {
-		int minDistance;
-		int actualDistance;
-		int crossRoadPos;
-		CrossRoad inFrontCR, actualCR;
-		Iterator<CrossRoad> itr;
-
-		inFrontCR = null;
-		minDistance = this.getCmLong() + 1;
-		itr = this.crossroads.iterator();
-		while (itr.hasNext()) {
-			actualCR = itr.next();
-
-			crossRoadPos = actualCR.getIniX();
-			if (avio.getDirection() == Direction.FORWARD) {
-				crossRoadPos = actualCR.getFinX();
-			}
-			actualDistance = avio.getDirection().getIncrement() * (crossRoadPos - this.getCmPosX(avio.getCmPosition(), avio.getDirection()));
-
-			if ((actualDistance < minDistance) && (actualDistance > 0)) {
-				minDistance = actualDistance;
-				inFrontCR = actualCR;
-			}
-		}
-
-		return inFrontCR;
-	}
-
-	@Override
 	public boolean insideAnyCrossRoad(int cmPosition) {
 		return this.intersectedCrossRoad(cmPosition) != null;
 	}
@@ -102,7 +73,7 @@ public class HCarrer extends Carrer {
 			cr = itr.next();
 
 			if (this.insideThisCrossRoad(cmPosX, cr)) {
-				return cr; // ==============================================>>
+				return cr; 
 			}
 		}
 
@@ -114,12 +85,11 @@ public class HCarrer extends Carrer {
 
 		cmPosX = this.cmIniX + cmPosition;
 		if (cmPosX < this.cmIniX || cmPosX > this.cmFinX) {
-			return -1; // ============== Off road ============================>>
+			return -1; 
 		}
 
 		return cmPosX;
 	}
-
 
 	public int getCmPosY(int cmPosition, Avio.Direction direction) {
 		if (direction == Avio.Direction.FORWARD) {
@@ -128,7 +98,6 @@ public class HCarrer extends Carrer {
 			return this.cmIniY + (this.cmWidth / 4);
 		}
 	}
-
 
 	public int getCmPosition(int cmPosX, int cmPosY, Avio.Direction direction) {
 		int cmPosition;
@@ -139,15 +108,5 @@ public class HCarrer extends Carrer {
 		}
 
 		return cmPosition;
-	}
-	
-	@Override
-	public int distanceToCrossRoadInCm(CrossRoad cr, Avio Avio) {
-		return 0;
-	}
-
-	@Override
-	public boolean posIsInside(int cmPosition, Direction direction) {
-		return false;
 	}
 }

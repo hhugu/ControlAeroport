@@ -2,7 +2,6 @@ package aeroport;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import aeroport.Avio.Direction;
 
@@ -20,14 +19,16 @@ public abstract class Carrer {
     protected ArrayList<CrossRoad> crossroads = new ArrayList<CrossRoad>();
     protected ArrayList<Integer> forwardEntryPoint = new ArrayList<Integer>();
     protected ArrayList<Integer> backwardEntryPoint = new ArrayList<Integer>();
+    protected int numAvions;
 
-    public Carrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
+    public Carrer(String idWay, int numAvions, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
         this.idWay = idWay;
         this.cmLong = cmLong;
         this.cmWidth = cmWayWidth;
         this.cmMark = cmWayMark;
         this.cmIniX = cmPosIniX;
         this.cmIniY = cmPosIniY;
+        this.numAvions = numAvions;
         
         this.createDefaultEntryPoints();
     }
@@ -73,71 +74,31 @@ public abstract class Carrer {
         return cmPosition;
     }
 
-    public synchronized void addAvio(Avio avio) {
-
-            this.avions.add(avio);
-
-    }
-
-    public abstract void addCrossRoad(CrossRoad cr);
-
     private void createDefaultEntryPoints() {
         this.forwardEntryPoint.add(0);
         this.backwardEntryPoint.add(this.cmLong);
     }
-
-    public abstract int distanceToCrossRoadInCm(CrossRoad cr, Avio Avio);
-
-    public abstract CrossRoad inFrontCrossRoad(Avio Avio);
-
-    public synchronized Avio inFrontAvio(Avio Avio) {
-        ArrayList<Avio> AvioList;
-        Avio inFrontAvio, actualAvio;
-        int minDistance, actualDistance;
-
-        inFrontAvio = null;
-            AvioList = this.avions;
-
-
-        minDistance = this.getCmLong() + 1;
-
-        Iterator<Avio> itr = AvioList.iterator();
-        while (itr.hasNext()) {
-            actualAvio = itr.next();
-
-            if (!actualAvio.equals(Avio)) {
-                actualDistance = Avio.getDirection().getIncrement() * (actualAvio.getCmPosition() - Avio.getCmPosition());
-
-                if ((actualDistance < minDistance) && (actualDistance > 0)) {
-                    minDistance = actualDistance;
-                    inFrontAvio = actualAvio;
-                }
-            }
-        }
-
-        return inFrontAvio;
+    
+    public ArrayList<Avio> getAvions(){
+    	return avions;
     }
+
+    public abstract void addCrossRoad(CrossRoad cr);
 
     public abstract boolean insideAnyCrossRoad(int cmPosition);
 
     public abstract CrossRoad intersectedCrossRoad(int cmPosition);
 
     public abstract boolean insideThisCrossRoad(int cmPosition, CrossRoad crossRoad);
-
-    public abstract boolean posIsInside(int cmPosition, Direction direction);
     
     public abstract int getCmPosX(int cmPosition, Direction direction);
     
     public abstract int getCmPosY(int cmPosition, Direction direction);
 
-    public synchronized void removeAvio(Avio Avio) {
-        this.avions.remove(Avio);
-    }
-
     public boolean carrerIntersection(Carrer way) {
         Carrer vWay, hWay;
-
         hWay = vWay = null;
+        
         if (way instanceof VCarrer) {
             vWay = way;
         }
@@ -155,7 +116,7 @@ public abstract class Carrer {
         }
 
         if ((vWay == null) || (hWay == null)) {
-            return false; // =================>
+            return false; 
         }
 
         return (hWay.cmIniX <= vWay.cmFinX)
@@ -172,4 +133,24 @@ public abstract class Carrer {
     }
 
 	public abstract int getCmPosition(int cmPosX, int cmPosY, Direction direction);
+	
+	public synchronized void ocuparCarrer(Avio avio){
+		if(numAvions == 1){
+			while(avions.size() >= 1){
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}			
+		avions.add(avio);
+	}
+	
+	public synchronized void alliberarCarrer(Avio avio){
+		if (numAvions == 1) {
+			notify();
+		}
+		avions.remove(avio);
+	}
 }

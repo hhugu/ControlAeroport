@@ -21,7 +21,8 @@ import aeroport.Finger.Estat;
 
 public class Aeroport extends JFrame implements Runnable, MouseWheelListener, ActionListener, ComponentListener {
 	
-    public static void main(String[] args) {Aeroport ciutat = new Aeroport();}
+    @SuppressWarnings("unused")
+	public static void main(String[] args) {Aeroport ciutat = new Aeroport();}
     
    private static final long serialVersionUID = 1864146382345156552L;
 	public static final int CIUTAT_CM_WIDTH = 60000; // Amplada ciutat
@@ -30,8 +31,8 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
     public static final int FRAME_PIX_HEIGHT = 620;  // Al�ada window 
     public static final int MAPA_PIX_WIDTH = 1080; // Amplada window
     public static final int MAPA_PIX_HEIGH = 620;  // Al�ada window 
-	private static final int MAX_AVIONS = 10;
-	public static final int SLEEP_TIME = 30;
+   private static final int MAX_AVIONS = 10;
+	public static final int SLEEP_TIME = 20;
 	public static final int VELOCITAT_SEGURITAT = 50, VELOCITAT_DE_VOL = 460; 
 
 
@@ -42,7 +43,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	private ArrayList <Carrer> carrers;
 	private ArrayList <Finger> fingers;
 	private ArrayList <String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
-    
+	
     private Mapa mapa;
     
     public Aeroport() {
@@ -55,7 +56,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         
         createFrame();
         crearRutes();
-
+		
         new Thread(mapa).start();
         new Thread(this).start();
     }
@@ -328,12 +329,17 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	/*
 	 * VENT
 	 */
+	
 	public Direction direccioDespegue(){
 		if(mapa.getVent() == 0) return Direction.FORWARD;
 		else if(mapa.getVent() == 1) return Direction.BACKWARD;
 		
 		return null;
 	}
+	
+	/*
+	 * RUN 
+	 */
     
     @SuppressWarnings("unchecked")
     public void run() {
@@ -351,7 +357,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         		Finger finger = afegirFingerARuta(rutaAlFinger);
         			
         		try {
-        			addAvio(i+"", carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
+        			addAvio("A10"+i, carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
         			rutaAlFinger.remove(rutaAlFinger.size()-1);
         			Thread.sleep(2000);
         		} catch (InterruptedException e) {
@@ -363,6 +369,10 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         finalitzar();
     }
 
+    /*
+     * CONTROL AEROPORT
+     */
+    
     private void finalitzar() {
     	try {
 	        avions.removeAll(avions);

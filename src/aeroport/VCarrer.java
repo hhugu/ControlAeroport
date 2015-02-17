@@ -10,9 +10,8 @@ import aeroport.Avio.Direction;
 
 public class VCarrer extends Carrer {
 
-	public VCarrer(String idWay, int cmWayWidth, int cmWayMark, int cmLong,	int cmPosIniX, int cmPosIniY) {
-
-		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
+	public VCarrer(String idWay, int numAvions, int cmWayWidth, int cmWayMark, int cmLong,	int cmPosIniX, int cmPosIniY) {
+		super(idWay, numAvions, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
 
 		this.cmFinX = this.cmIniX + this.cmWidth;
 		this.cmFinY = this.cmIniY + this.cmLong;
@@ -51,36 +50,6 @@ public class VCarrer extends Carrer {
 		g.fillRect(xIni, yIni, xFin - xIni, yFin - yIni);
 		g.setColor(Color.decode("0x505050"));
 		g.drawRect(xIni, yIni, xFin - xIni, yFin - yIni);
-	}
-
-	public CrossRoad inFrontCrossRoad(Avio avio) {
-		int minDistance;
-		int actualDistance;
-		int crossRoadPos;
-		CrossRoad inFrontCR, actualCR;
-		Iterator<CrossRoad> itr;
-
-		inFrontCR = null;
-		minDistance = this.getCmLong() + 1;
-		itr = this.crossroads.iterator();
-		while (itr.hasNext()) {
-			actualCR = itr.next();
-
-			crossRoadPos = actualCR.getFinY();
-			if (avio.getDirection() == Direction.FORWARD) {
-				crossRoadPos = actualCR.getIniY();
-			}
-			actualDistance = avio.getDirection().getIncrement()
-					* (crossRoadPos - this.getCmPosY(avio.getCmPosition(),
-							avio.getDirection()));
-
-			if ((actualDistance < minDistance) && (actualDistance > 0)) {
-				minDistance = actualDistance;
-				inFrontCR = actualCR;
-			}
-		}
-
-		return inFrontCR;
 	}
 
 	@Override
@@ -125,7 +94,7 @@ public class VCarrer extends Carrer {
 
 		cmPosY = this.cmIniY + cmPosition;
 		if (cmPosY < this.cmIniY || cmPosY > this.cmFinY) {
-			return -1; // Fuera de la via ====================================>>
+			return -1; // Fuera de la via
 		}
 		return cmPosY;
 	}
@@ -135,21 +104,9 @@ public class VCarrer extends Carrer {
 
 		cmPosition = cmPosY - this.cmIniY;
 		if (cmPosY < this.cmIniY || cmPosY > this.cmFinY) {
-			return -1; // ============== Off road ============================>>
+			return -1; // Fuera de la via
 		}
 
 		return cmPosition;
-	}
-
-	@Override
-	public int distanceToCrossRoadInCm(CrossRoad cr, Avio Avio) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean posIsInside(int cmPosition, Direction direction) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

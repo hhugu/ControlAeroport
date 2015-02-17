@@ -51,12 +51,12 @@ public class Mapa extends Canvas implements Runnable {
         cmHCarrerWidth = cmVCarrerWidth+200;
         cmCarrerMark = 300;
         
-        goFingers=new HCarrer("goFingers",this.cmHCarrerWidth, this.cmCarrerMark, 12000, 11000, 9000);
+        goFingers=new HCarrer("goFingers", 1, cmHCarrerWidth, cmCarrerMark, 12000, 11000, 9000);
         
         carrers = new ArrayList<Carrer>();
         crossroads = new ArrayList<CrossRoad>();
        
-        this.loadCarrers();
+        loadCarrers();
         
  /*
          *     *	*	*	*
@@ -70,9 +70,9 @@ public class Mapa extends Canvas implements Runnable {
         calculateCrossRoads();
         
         try {
-            this.imgFondo = ImageIO.read(new File("Imagenes/fondo.png"));
-            this.imgAeroport = ImageIO.read(new File("Imagenes/terminal.png"));
-            this.imgVent = ImageIO.read(new File("Imagenes/viento.png"));
+            imgFondo = ImageIO.read(new File("Imagenes/fondo.png"));
+            imgAeroport = ImageIO.read(new File("Imagenes/terminal.png"));
+            imgVent = ImageIO.read(new File("Imagenes/viento.png"));
         } catch (IOException e) {
             System.out.println("Img Error: not found");
         }
@@ -166,8 +166,7 @@ public class Mapa extends Canvas implements Runnable {
     }
 
     public synchronized void paint() {
-        BufferStrategy bs;
-        bs = getBufferStrategy();
+        BufferStrategy bs = getBufferStrategy();
         if (bs == null) {
             return; 
         }
@@ -192,8 +191,8 @@ public class Mapa extends Canvas implements Runnable {
          
          iniX = (int)((0 / factorX) + offsetX);
          iniY = (int)((0 / factorY) + offsetY);
-         finX = (int)((30000 / factorX));
-         finY = (int)((20000 / factorY));  
+         finX = (int)((60000 / factorX));
+         finY = (int)((40000 / factorY));  
          
 
         g.drawImage(imgFondo, iniX, iniY, finX, finY, null);
@@ -280,13 +279,13 @@ public class Mapa extends Canvas implements Runnable {
     
     private void loadCarrers() {
     	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY , Direction
-    	carrers.add(new HCarrer("pista", cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500));
-    	carrers.add(new HCarrer("h2", cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500));
-    	carrers.add(new VCarrer("iniciPista", cmVCarrerWidth, cmCarrerMark, 6100, 5000, 500));
-        carrers.add(new VCarrer("fiPista", cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500));
-        carrers.add(new HCarrer("h1", cmHCarrerWidth, cmCarrerMark, 6100, 5000, 6500));
+    	carrers.add(new HCarrer("pista", 1, cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500));
+    	carrers.add(new HCarrer("h2", 0, cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500));
+    	carrers.add(new VCarrer("iniciPista", 0, cmVCarrerWidth, cmCarrerMark, 6100, 5000, 500));
+        carrers.add(new VCarrer("fiPista", 0, cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500));
+        carrers.add(new HCarrer("h1", 0, cmHCarrerWidth, cmCarrerMark, 6100, 5000, 6500));
         carrers.add(goFingers);
-        carrers.add(new VCarrer("v1", cmVCarrerWidth, cmCarrerMark, 3000, 11000, 6500));
+        carrers.add(new VCarrer("v1", 0, cmVCarrerWidth, cmCarrerMark, 3000, 11000, 6500));
     }
     
     private void loadFingers(){

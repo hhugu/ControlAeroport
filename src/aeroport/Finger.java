@@ -14,7 +14,7 @@ public class Finger extends Carrer {
 	
 	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY	
 	public Finger(String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
-		super(idWay, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
+		super(idWay, 1, cmWayWidth, cmWayMark, cmLong, cmPosIniX, cmPosIniY);
         this.cmFinX = this.cmIniX + this.cmWidth;
         this.cmFinY = this.cmIniY + this.cmLong;
         
@@ -55,36 +55,6 @@ public class Finger extends Carrer {
         g.setColor(Color.DARK_GRAY);
         g.drawRect(xIni, yIni, xFin - xIni, yFin - yIni);
     }
-	
-	public CrossRoad inFrontCrossRoad(Avio avio) {
-		int minDistance;
-		int actualDistance;
-		int crossRoadPos;
-		CrossRoad inFrontCR, actualCR;
-		Iterator<CrossRoad> itr;
-
-		inFrontCR = null;
-		minDistance = this.getCmLong() + 1;
-		itr = this.crossroads.iterator();
-		while (itr.hasNext()) {
-			actualCR = itr.next();
-
-			crossRoadPos = actualCR.getFinY();
-			if (avio.getDirection() == Direction.FORWARD) {
-				crossRoadPos = actualCR.getIniY();
-			}
-			actualDistance = avio.getDirection().getIncrement()
-					* (crossRoadPos - this.getCmPosY(avio.getCmPosition(),
-							avio.getDirection()));
-
-			if ((actualDistance < minDistance) && (actualDistance > 0)) {
-				minDistance = actualDistance;
-				inFrontCR = actualCR;
-			}
-		}
-
-		return inFrontCR;
-	}
 
 	@Override
 	public boolean insideAnyCrossRoad(int cmPosition) {
@@ -142,17 +112,5 @@ public class Finger extends Carrer {
 		}
 
 		return cmPosition;
-	}
-
-	@Override
-	public int distanceToCrossRoadInCm(CrossRoad cr, Avio Avio) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean posIsInside(int cmPosition, Direction direction) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }
