@@ -34,8 +34,8 @@ public class Mapa extends Canvas implements Runnable {
 
     public Mapa(int cityCmWidth, int cityCmHeight, int mapPixWidth, int mapPixHeight, Aeroport aeroport) {
     	
-    	vent = ((int) (Math.random()*2));
-    	
+//    	vent = ((int) (Math.random()*2));
+    	vent = 0;
     	this.aeroport = aeroport;
         this.cityCmWidth = cityCmWidth;
         this.cityCmHeight = cityCmHeight;
@@ -278,9 +278,9 @@ public class Mapa extends Canvas implements Runnable {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     private void loadCarrers() {
-    	//String idWay, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY , Direction
+    	//String idWay, int maxAvions, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY
     	carrers.add(new HCarrer("pista", 1, cmHCarrerWidth+600, cmCarrerMark, 22000, 3000, 500));
-    	carrers.add(new HCarrer("h2", 0, cmHCarrerWidth, cmCarrerMark, 18000, 5000, 2500));
+    	carrers.add(new HCarrer("h2", 0, cmHCarrerWidth, cmCarrerMark, 18000, 5000, 4000));
     	carrers.add(new VCarrer("iniciPista", 0, cmVCarrerWidth, cmCarrerMark, 6100, 5000, 500));
         carrers.add(new VCarrer("fiPista", 0, cmVCarrerWidth, cmCarrerMark, 9000, 22210, 500));
         carrers.add(new HCarrer("h1", 0, cmHCarrerWidth, cmCarrerMark, 6100, 5000, 6500));

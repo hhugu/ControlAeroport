@@ -54,6 +54,7 @@ public class Finger extends Carrer {
         
         g.setColor(Color.DARK_GRAY);
         g.drawRect(xIni, yIni, xFin - xIni, yFin - yIni);
+        
     }
 
 	@Override

@@ -39,7 +39,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
     private static volatile boolean pauseCity;
     private static volatile boolean endCity;
         
-    private ArrayList <Avio> avions = new ArrayList<Avio>();
+    ArrayList <Avio> avions = new ArrayList<Avio>();
 	private ArrayList <Carrer> carrers;
 	private ArrayList <Finger> fingers;
 	private ArrayList <String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
@@ -278,7 +278,6 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
 		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
-		avions.add(avio);
 		avio.start();
 	}
 	
@@ -324,6 +323,17 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 			}
 		}
 		if(estat.equals(Estat.buit)) notify();
+	}
+	
+	public boolean pucAvançar(Avio avioQueDemanaPermis){
+		Avio avioQueSeMou;
+		for (int i = 0; i < avions.size(); i++) {
+			avioQueSeMou = avions.get(i);
+			if (!avioQueDemanaPermis.equals(avioQueSeMou)) {
+				if(avioQueDemanaPermis.posicioQueOcupare().intersects(avioQueSeMou.posicioQueOcup())) return false;
+			}
+		}
+		return true;
 	}
 	
 	/*
