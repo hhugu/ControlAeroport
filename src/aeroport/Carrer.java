@@ -14,28 +14,32 @@ public abstract class Carrer {
     protected int cmFinX;
     protected int cmFinY;
     protected int cmWidth;
-    protected int cmMark;
     protected ArrayList<Avio> avions = new ArrayList<Avio>();
     protected ArrayList<CrossRoad> crossroads = new ArrayList<CrossRoad>();
     protected ArrayList<Integer> forwardEntryPoint = new ArrayList<Integer>();
     protected ArrayList<Integer> backwardEntryPoint = new ArrayList<Integer>();
-    protected int numAvions;
+    protected boolean nomesUnAvio;
 
-    public Carrer(String idWay, int numAvions, int cmWayWidth, int cmWayMark, int cmLong, int cmPosIniX, int cmPosIniY) {
+    public Carrer(String idWay, boolean nomesUnAvio, int cmWayWidth, int cmLong, int cmPosIniX, int cmPosIniY) {
         this.idWay = idWay;
         this.cmLong = cmLong;
         this.cmWidth = cmWayWidth;
-        this.cmMark = cmWayMark;
         this.cmIniX = cmPosIniX;
         this.cmIniY = cmPosIniY;
-        this.numAvions = numAvions;
+        this.nomesUnAvio = nomesUnAvio;
         
         this.createDefaultEntryPoints();
     }
     
-    public CrossRoad getNextCrossRoad(String proximCarrer, Carrer c){
+    /**
+     * Metode que retorna el cruce on hi ha el proxim carrer a agafar. Ho fa comparant els id's dels carrers.
+     * @param proximCarrer - String
+     * @param carerActual - Carrer
+     * @return
+     */
+    public CrossRoad getNextCrossRoad(String proximCarrer, Carrer carrerActual){
     	for (int i = 0; i < crossroads.size(); i++) {
-			if (crossroads.get(i).getCarrer(c).getId().equals(proximCarrer)) {
+			if (crossroads.get(i).getCarrer(carrerActual).getId().equals(proximCarrer)) {
 				return crossroads.get(i);
 			}
 		}
@@ -59,18 +63,13 @@ public abstract class Carrer {
 
     public int getEntryPoint(Direction direction) {
         int cmPosition = 0;
-
         switch (direction) {
-            case FORWARD:
-                cmPosition = this.forwardEntryPoint.get(0);
-                break;
-            case BACKWARD:
-                cmPosition = this.backwardEntryPoint.get(0);
-                break;
-            default:
-                throw new AssertionError(direction.name());
+            case FORWARD: cmPosition = this.forwardEntryPoint.get(0); break;
+            
+            case BACKWARD: cmPosition = this.backwardEntryPoint.get(0); break;
+            
+            default: throw new AssertionError(direction.name());
         }
-
         return cmPosition;
     }
 
@@ -129,13 +128,18 @@ public abstract class Carrer {
 
     @Override
     public String toString() {
-        return "Avió: " + this.getId();
+        return "Carrer: " + this.getId();
     }
 
 	public abstract int getCmPosition(int cmPosX, int cmPosY, Direction direction);
 	
+	/**
+	 * Afageix l'avio al carrer. Si al carrer nomes hi pot anar un avio els que volen entrar queden esperant
+	 * fins que els notifiquin que poden entrar.
+	 * @param avio - Avio
+	 */
 	public synchronized void ocuparCarrer(Avio avio){
-		if(numAvions == 1){
+		if(nomesUnAvio){
 			while(avions.size() >= 1){
 				try {
 					wait();
@@ -147,8 +151,12 @@ public abstract class Carrer {
 		avions.add(avio);
 	}
 	
+	/**
+	 * Borra l'avio del carrer. Si al carrer nomes hi pot haver un avio notifica als que esperen que poden entrar.
+	 * @param avio - Avio
+	 */
 	public synchronized void alliberarCarrer(Avio avio){
-		if (numAvions == 1) {
+		if (nomesUnAvio) {
 			notify();
 		}
 		avions.remove(avio);

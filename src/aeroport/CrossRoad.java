@@ -9,24 +9,14 @@ import java.awt.Graphics;
  * @author Jumi
  */
 public class CrossRoad {
-    private String idCrossRoad;
-//    private boolean northCarrer;
-//    private boolean southCarrer;
-//    private boolean eastCarrer;
-//    private boolean westCarrer;
-    private int safetySpeedInCmHour;
-    
+    private String idCrossRoad;    
     private int cmIniX, cmIniY, cmFinX, cmFinY;
     private int cmWidthX, cmWidthY;
     
     private Carrer hCarrer;
     private Carrer vCarrer;
-    //private ArrayList<Turn> turns = new ArrayList<Turn>();
-
     
-    public CrossRoad(Carrer Carrer1, Carrer Carrer2) {
-        this.safetySpeedInCmHour = 600;
-        
+    public CrossRoad(Carrer Carrer1, Carrer Carrer2) {        
         this.setCarrers(Carrer1, Carrer2);
         this.setDimension();
         this.setPosition();
@@ -54,10 +44,6 @@ public class CrossRoad {
     
     public int getFinY() {        
         return this.cmFinY;
-    }
-
-    public int getSafetySpeedInCmHour() {
-        return this.safetySpeedInCmHour;
     }
     
     public Carrer getVCarrer() {
@@ -113,12 +99,8 @@ public class CrossRoad {
         this.cmFinY = this.cmIniY + this.cmWidthY;
     }
     
-    public void setSafetySpeedInCmHour(int safetySpeedInCmHour) {
-        this.safetySpeedInCmHour = safetySpeedInCmHour;
-    }
-    
     public String toString() {
-        return "Crossroad "+this.getId();
+        return "Crossroad :"+this.getId();
     }
     
     public void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {

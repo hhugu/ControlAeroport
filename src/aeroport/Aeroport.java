@@ -16,7 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import aeroport.Avio.Direction;
-import aeroport.Finger.Estat;
+import aeroport.Finger.EstatFinguer;
 
 
 public class Aeroport extends JFrame implements Runnable, MouseWheelListener, ActionListener, ComponentListener {
@@ -60,11 +60,11 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         new Thread(mapa).start();
         new Thread(this).start();
     }
-    
+
     /*
      * CARREGAR PART GRAFICA
      */
-    
+
     private void createFrame() {
         Container panel;
         
@@ -206,6 +206,11 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 * RUTES
 	 */
     
+    /**
+     * Crea totes les posibles rutes per anar cap als fingers i per anar cap a la pista.
+     * Despres s'escolligar en funcio del vent.
+     * @author hugu
+     */
 	private void crearRutes(){
 		//Ruta Oest: Aterra i despega enrrera
 		rutaAlFingerOest = new ArrayList<String>();
@@ -236,22 +241,12 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		rutaDespegueEst.add(("pista"));
 		
 	}
-	
-	private synchronized Finger afegirFingerARuta(ArrayList<String> ruta) {
-		Finger finger;
-		while(!hiHaUnQualqueFinguerBuit()){
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		finger = getPrimerFingerBuit();
-		ruta.add(finger.idWay);
 
-		return finger;
-	}
-
+	/**
+	 * Retorna la ruta fins al figuer a seguir per l'avio en funcio del fent
+	 * @param vent - int
+	 * @return ArrayList<String>
+	 */
 	private ArrayList<String> triarRutaAlFinger(int vent) {
 		switch(vent){
 		case 0: return rutaAlFingerEst;
@@ -260,12 +255,85 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		return null;
 	}
 	
+	/**
+	 * Retorna la ruta fins a la pista a seguir per l'avio en funcio del fent
+	 * @param vent - int
+	 * @return ArrayList<String>
+	 */
 	private ArrayList<String> triarRutaDespegue(int vent) {
 		switch(vent){
 		case 0: return rutaDespegueEst;
 		case 1: return rutaDespegueOest;
 		}
 		return null;
+	}
+	
+	/**
+	 * Afegeix el finger a la ruta. Si estan tots ocupats es queda esperant a que li notifiquin que hi ha un 
+	 * finger disposible.
+	 * @param ruta - ArrayList<String>
+	 * @return fingerDisponible - Finger
+	 */
+	private synchronized Finger afegirFingerARuta(ArrayList<String> ruta) {
+		Finger fingerDisponible;
+		while(!hiHaUnQualqueFinguerBuit()){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		fingerDisponible = getPrimerFingerBuit();
+		ruta.add(fingerDisponible.idWay);
+
+		return fingerDisponible;
+	}
+	
+	/*
+	 * FINGERS
+	 */
+	
+	/**
+	 * Helper per obtenir el primer finger buit. Un cop obtes el reserva per l'avio.
+	 * @return - fingerDisponible - Finger
+	 */
+	private Finger getPrimerFingerBuit(){
+		Finger fingerDisponible;
+		for (int i = 0; i < fingers.size(); i++) {
+			fingerDisponible = fingers.get(i);
+			if (fingerDisponible.estaDisponible()) {
+				this.canviarEstatFinger(fingerDisponible, EstatFinguer.reservat);
+				return fingers.get(i);
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Helper per sabre si hi ha un finger disponible.
+	 * @return boolean - True si n'hi ha qualqun, False si no. 
+	 */
+	private boolean hiHaUnQualqueFinguerBuit() {
+		for (int i = 0; i < fingers.size(); i++) {
+			if (fingers.get(i).estaDisponible()) {
+				return true;
+			}
+		}		
+		return false;
+	}
+	
+	/**
+	 * Helper per canviar l'estat a un figuer. Si el finguer es buida notifica a qui espera que n'hi ha un de buit.
+	 * @param finger - Finger
+	 * @param estat - EstatFinger
+	 */
+	public synchronized void canviarEstatFinger(Finger finger, EstatFinguer estat){
+		for (int i = 0; i < fingers.size(); i++) {
+			if (fingers.get(i).equals(finger)) {
+				fingers.get(i).setEstat(estat);
+			}
+		}
+		if(estat.equals(EstatFinguer.buit)) notify();
 	}
 	
 	/*
@@ -276,55 +344,66 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		return avions;
 	}
 	
+	/**
+	 * Helper per crear un avio i posarlo en marxa.
+	 * @param idavio - String
+	 * @param way - Carrer
+	 * @param direction - Direcction
+	 * @param rutaAlFinger - ArrayList<String>
+	 * @param rutaDespegue - ArrayList<String>
+	 * @param finger - Finger
+	 */
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
 		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
 		avio.start();
 	}
 	
+	/**
+	 * Helper que crida al paint de l'avio de tots els avions dins l'arrayList d'avions.
+	 * @param g - Graphics
+	 * @param factorX - float
+	 * @param factorY - float
+	 * @param offsetX - int
+	 * @param offsetY - int
+	 */
 	public void paintAvions(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
 		for(int i=0; i < avions.size(); i++){
 			avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
 		}
 	}
 	
+	/**
+	 * Helper per borrar l'avio de l'ArrayList d'avions
+	 * @param avio
+	 */
 	public void borrarAvio(Avio avio){
 		avions.remove(avio);
 	}
 	
 	/*
-	 * FINGERS
+	 * VENT
 	 */
 	
-	private Finger getPrimerFingerBuit(){
-		Finger finger;
-		for (int i = 0; i < fingers.size(); i++) {
-			finger = fingers.get(i);
-			if (finger.estaDisponible()) {
-				this.canviarEstatFinger(finger, Estat.reservat);
-				return fingers.get(i);
-			}
-		}
+	/**
+	 * Metode per obtenir la direccio en funcio del vent
+	 * @return Direcction
+	 */
+	public Direction direccioDespegue(){
+		if(mapa.getVent() == 0) return Direction.FORWARD;
+		else if(mapa.getVent() == 1) return Direction.BACKWARD;
+		
 		return null;
 	}
 	
-	private boolean hiHaUnQualqueFinguerBuit() {
-		for (int i = 0; i < fingers.size(); i++) {
-			if (fingers.get(i).estaDisponible()) {
-				return true;
-			}
-		}		
-		return false;
-	}
-	
-	public synchronized void canviarEstatFinger(Finger finger, Estat estat){
-		for (int i = 0; i < fingers.size(); i++) {
-			if (fingers.get(i).equals(finger)) {
-				fingers.get(i).setEstat(estat);
-			}
-		}
-		if(estat.equals(Estat.buit)) notify();
-	}
-	
+	 /*
+     * CONTROL AEROPORT
+     */
+    
+	/**
+	 * Metode per sabre si si quan avanci l'avio tocara a un altre.
+	 * @param avioQueDemanaPermis - Avio
+	 * @return boolean - True si pot avançar, false si tocara a cualque avio.
+	 */
 	public boolean pucAvançar(Avio avioQueDemanaPermis){
 		Avio avioQueSeMou;
 		for (int i = 0; i < avions.size(); i++) {
@@ -335,18 +414,25 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		}
 		return true;
 	}
-	
-	/*
-	 * VENT
-	 */
-	
-	public Direction direccioDespegue(){
-		if(mapa.getVent() == 0) return Direction.FORWARD;
-		else if(mapa.getVent() == 1) return Direction.BACKWARD;
-		
-		return null;
+    
+    private void finalitzar() {
+    	try {
+	        avions.removeAll(avions);
+	        mapa.paint();
+			Thread.sleep(100);
+			dispose();
+    	} catch (InterruptedException e) {
+		}
 	}
-	
+
+	public static boolean isPaused() {
+        return Aeroport.pauseCity;
+    }
+    
+    public static boolean isEnd() {
+        return Aeroport.endCity;
+    }
+    
 	/*
 	 * RUN 
 	 */
@@ -358,18 +444,20 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         
         while (!Aeroport.isEnd()) {
             if (!Aeroport.isPaused() && avions.size() < MAX_AVIONS) {
+            	
             	vent = mapa.getVent();
         		if(vent == 0) direccio = Direction.FORWARD;
         		else if(vent ==1) direccio = Direction.BACKWARD;
         				
         		ArrayList<String> rutaAlFinger = triarRutaAlFinger(vent);
         		ArrayList<String> rutaDespegue = triarRutaDespegue(vent);
+        		
         		Finger finger = afegirFingerARuta(rutaAlFinger);
         			
         		try {
         			addAvio("A10"+i, carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
         			rutaAlFinger.remove(rutaAlFinger.size()-1);
-        			Thread.sleep(2000);
+        			Thread.sleep(200);
         		} catch (InterruptedException e) {
         			e.printStackTrace();
         		}
@@ -377,27 +465,5 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
             }
         }
         finalitzar();
-    }
-
-    /*
-     * CONTROL AEROPORT
-     */
-    
-    private void finalitzar() {
-    	try {
-	        avions.removeAll(avions);
-	        mapa.paint();
-			Thread.sleep(100);
-			this.dispose();
-    	} catch (InterruptedException e) {
-		}
-	}
-
-	public static boolean isPaused() {
-        return Aeroport.pauseCity;
-    }
-    
-    public static boolean isEnd() {
-        return Aeroport.endCity;
     }
 }

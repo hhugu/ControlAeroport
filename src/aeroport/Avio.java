@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import aeroport.Finger.Estat;
+import aeroport.Finger.EstatFinguer;
 
 public class Avio extends Thread {
 	
@@ -90,7 +90,7 @@ public class Avio extends Thread {
 	 * @author hugu
 	 */
 	private void avançar() {
-		//if (aeroport.pucAvançar(this)) {
+		if (aeroport.pucAvançar(this)) {
 			if (direccio == Direction.BACKWARD)	cmPosition -= speed;
 			else if (direccio == Direction.FORWARD) cmPosition += speed;
 			
@@ -98,7 +98,7 @@ public class Avio extends Thread {
 				if (cmPosition < 0)	direccio = Direction.FORWARD;
 				else if (cmPosition > carrerActual.cmLong) direccio = Direction.BACKWARD;
 			}
-		//}
+		}
 		try {
 			Thread.sleep(Aeroport.SLEEP_TIME);
 		} catch (InterruptedException e) {
@@ -130,7 +130,7 @@ public class Avio extends Thread {
 	 * GOPISTA i el del finger a buit. 
 	 */
 	private void descarregarCarregar() {
-		aeroport.canviarEstatFinger(finger, Estat.ocupat);
+		aeroport.canviarEstatFinger(finger, EstatFinguer.ocupat);
 		
 		direccio = Direction.FORWARD;
 		while((cmPosition + cmLong + 300) <= carrerActual.getCmLong()) avançar();					
@@ -138,7 +138,7 @@ public class Avio extends Thread {
 			Thread.sleep(6500);
 			cmPosition = finger.getCmLong();
 			estat = EstatAvio.GOPISTA;
-			aeroport.canviarEstatFinger(finger, Estat.buit);
+			aeroport.canviarEstatFinger(finger, EstatFinguer.buit);
 			posicio = 0;
 		} catch (InterruptedException e) {
 		}		
@@ -218,7 +218,7 @@ public class Avio extends Thread {
 	 * @param offsetX - int
 	 * @param offsetY - int
 	 */
-	public synchronized void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
+	public void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
 		g.setColor(Color.RED);
 		int iniX = 0, iniY = 0, finX, finY;
 		
@@ -239,6 +239,11 @@ public class Avio extends Thread {
 	   		
 	   		g.drawString(idAvio, iniX, iniY);
 	   		
+	   		iniX = carrerActual.getCmPosIniX() + cmPosition;
+			iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
+	   		g.fillRect(iniX, iniY, finX+100, finY+100);
+
+	   		
    		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
    			
    			iniY=(int)((((this.carrerActual.cmIniY+this.cmPosition))/factorY)+offsetY);
@@ -251,6 +256,9 @@ public class Avio extends Thread {
 				g.drawImage(this.imgAvioV, iniX, iniY, finY, finX, null);
 			}
 	   		g.drawString(idAvio, iniX, iniY);
+	   		iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
+			iniY =  carrerActual.getCmPosIniY() + cmPosition;
+	   		g.fillRect(iniX, iniY, finX, finY);
    		}
     }
 	
@@ -265,7 +273,7 @@ public class Avio extends Thread {
 				iniX = carrerActual.getCmPosIniX() + cmPosition + cmLong;
 				iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
 			} else if (direccio == Direction.BACKWARD) {
-				iniX = carrerActual.getCmPosIniX() - cmPosition - cmLong;
+				iniX = carrerActual.getCmPosIniX() + cmPosition - cmLong;
 				iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
 			}
 		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
@@ -274,7 +282,7 @@ public class Avio extends Thread {
 				iniY =  carrerActual.getCmPosIniY() + cmPosition + cmLong;
 			}else if(direccio == Direction.BACKWARD){
 				iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
-				iniY =  carrerActual.getCmPosIniY() - cmPosition - cmLong;
+				iniY =  carrerActual.getCmPosIniY() + cmPosition - cmLong;
 			}
 		}
 		return new Rectangle(iniX, iniY, cmLong, cmWidth);
