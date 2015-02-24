@@ -218,7 +218,7 @@ public class Avio extends Thread {
 	 * @param offsetX - int
 	 * @param offsetY - int
 	 */
-	public void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
+	public void paint(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {		
 		g.setColor(Color.RED);
 		int iniX = 0, iniY = 0, finX, finY;
 		
@@ -290,14 +290,14 @@ public class Avio extends Thread {
 	
 	public Rectangle posicioQueOcup() {
 		int iniX = 0, iniY = 0;
+   		
 		if (carrerActual instanceof HCarrer) {
 			iniX = carrerActual.getCmPosIniX() + cmPosition;
 			iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
 		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
-			if (direccio == Direction.FORWARD) {
-				iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
-				iniY =  carrerActual.getCmPosIniY() + cmPosition;
-			}
+			iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
+			iniY =  carrerActual.getCmPosIniY() + cmPosition;
+			
 		}
 		return new Rectangle(iniX, iniY, cmLong, cmWidth);
 	}

@@ -100,14 +100,13 @@ public class Mapa extends Canvas implements Runnable {
     }
 
     public synchronized void paintImgMap() {
+    	
         if ((mapWidth <= 0) || (mapHeigth <= 0)) {
             System.out.println("Map size error: (" + mapWidth + "," + mapHeigth + ")");
             return; 
-        }
-
+        }  
         imgMap = new BufferedImage(mapWidth, mapHeigth, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = imgMap.createGraphics();
-        
         
         paintBackgroud(g);          
         paintTerminal(g, factorX, factorY, offsetX, offsetY);

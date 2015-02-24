@@ -466,4 +466,5 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         }
         finalitzar();
     }
+
 }
