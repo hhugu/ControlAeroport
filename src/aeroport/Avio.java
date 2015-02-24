@@ -58,9 +58,7 @@ public class Avio extends Thread {
     }
 	
 	public void run(){
-		setWay(carrerActual);
-		aeroport.avions.add(this);
-		
+		setWay(carrerActual);		
 		estat = EstatAvio.ATERRANT;
 		calcularEntrada();
 
@@ -135,7 +133,10 @@ public class Avio extends Thread {
 		direccio = Direction.FORWARD;
 		while((cmPosition + cmLong + 300) <= carrerActual.getCmLong()) avançar();					
 		try {
-			Thread.sleep(6500);
+			Thread.sleep((long)(Math.random()*10000+1000));
+			
+			while(aeroport.getCarrerCritic().getAvions().size() >= 4) Thread.sleep(Aeroport.SLEEP_TIME);
+			
 			cmPosition = finger.getCmLong();
 			estat = EstatAvio.GOPISTA;
 			aeroport.canviarEstatFinger(finger, EstatFinguer.buit);
@@ -297,7 +298,6 @@ public class Avio extends Thread {
 		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
 			iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
 			iniY =  carrerActual.getCmPosIniY() + cmPosition;
-			
 		}
 		return new Rectangle(iniX, iniY, cmLong, cmWidth);
 	}

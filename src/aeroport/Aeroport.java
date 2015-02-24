@@ -355,6 +355,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 */
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
 		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
+		avions.add(avio);
 		avio.start();
 	}
 	
@@ -368,7 +369,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 */
 	public void paintAvions(Graphics g, float factorX, float factorY, int offsetX, int offsetY) {
 		for(int i=0; i < avions.size(); i++){
-			avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
+			if (avions.get(i).getEstat() != null) avions.get(i).paint(g, factorX, factorY, offsetX, offsetY);
 		}
 	}
 	
@@ -443,8 +444,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         int i = 0, vent;
         
         while (!Aeroport.isEnd()) {
-            if (!Aeroport.isPaused() && avions.size() < MAX_AVIONS) {
-            	
+            if (!Aeroport.isPaused() && (avions.size() < MAX_AVIONS)) {
             	vent = mapa.getVent();
         		if(vent == 0) direccio = Direction.FORWARD;
         		else if(vent ==1) direccio = Direction.BACKWARD;
@@ -465,6 +465,13 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
             }
         }
         finalitzar();
+    }
+    
+    public Carrer getCarrerCritic(){
+    	for (int i = 0; i < carrers.size(); i++) {
+    		if (carrers.get(i).getId().equals("fiPista")) return carrers.get(i);
+		}
+    	return null;
     }
 
 }
