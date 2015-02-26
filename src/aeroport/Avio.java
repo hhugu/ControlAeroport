@@ -15,13 +15,13 @@ import aeroport.Finger.EstatFinguer;
 public class Avio extends Thread {
 	
 	private static final int ACCELERACIO = 5;
-    public static enum EstatAvio {ATERRANT, GOFINGER, DINS_FINGER, GOPISTA, DESPEGANT, VOLANT};    
+    public static enum Estat {ATERRANT, GOFINGER, DINS_FINGER, GOPISTA, DESPEGANT, VOLANT};    
 	public static enum Direction {FORWARD, BACKWARD}
 	private int cmLong, cmWidth;
     private Image imgAvioH, imgAvioV, imgAvioHB, imgAvioVB;
     private String idAvio;
 
-	private EstatAvio estat;
+	private Estat estat;
 	private Aeroport aeroport;
 	private Finger finger;
     private ArrayList<String> rutaAlFinger, rutaDespegue;
@@ -36,10 +36,10 @@ public class Avio extends Thread {
         this.aeroport = aeroport;
     	this.idAvio = idAvio;
         try {
-			imgAvioH = ImageIO.read(new File("Imagenes/avioH.png"));
-			imgAvioV = ImageIO.read(new File("Imagenes/avioV.png"));
-			imgAvioHB = ImageIO.read(new File("Imagenes/avioHB.png"));
-			imgAvioVB = ImageIO.read(new File("Imagenes/avioVB.png"));
+			imgAvioH = ImageIO.read(new File("Imagenes/avio/avioH.png"));
+			imgAvioV = ImageIO.read(new File("Imagenes/avio/avioV.png"));
+			imgAvioHB = ImageIO.read(new File("Imagenes/avio/avioHB.png"));
+			imgAvioVB = ImageIO.read(new File("Imagenes/avio/avioVB.png"));
 		} catch (IOException e) {
 		}
         
@@ -59,19 +59,19 @@ public class Avio extends Thread {
 	
 	public void run(){
 		setWay(carrerActual);		
-		estat = EstatAvio.ATERRANT;
+		estat = Estat.ATERRANT;
 		calcularEntrada();
 
 		while(!Aeroport.isEnd()){
 			if (!Aeroport.isPaused()) {
 				avançar();
 				
-				if(estat == EstatAvio.ATERRANT) aterrar();
-				else if(estat == EstatAvio.GOFINGER) calcularProximCarrer(rutaAlFinger);
-				else if(estat == EstatAvio.DINS_FINGER) descarregarCarregar();
-				else if(estat == EstatAvio.GOPISTA)	calcularProximCarrer(rutaDespegue);
-				else if(estat == EstatAvio.DESPEGANT) despegar();
-				else if(estat == EstatAvio.VOLANT){ aeroport.borrarAvio(this); carrerActual.alliberarCarrer(this);; }
+				if(estat == Estat.ATERRANT) aterrar();
+				else if(estat == Estat.GOFINGER) calcularProximCarrer(rutaAlFinger);
+				else if(estat == Estat.DINS_FINGER) descarregarCarregar();
+				else if(estat == Estat.GOPISTA)	calcularProximCarrer(rutaDespegue);
+				else if(estat == Estat.DESPEGANT) despegar();
+				else if(estat == Estat.VOLANT){ aeroport.borrarAvio(this); carrerActual.alliberarCarrer(this);; }
 			}
 		}
 	}
@@ -92,7 +92,7 @@ public class Avio extends Thread {
 			if (direccio == Direction.BACKWARD)	cmPosition -= speed;
 			else if (direccio == Direction.FORWARD) cmPosition += speed;
 			
-			if (estat != EstatAvio.VOLANT && estat != EstatAvio.ATERRANT && estat != EstatAvio.DESPEGANT) {
+			if (estat != Estat.VOLANT && estat != Estat.ATERRANT && estat != Estat.DESPEGANT) {
 				if (cmPosition < 0)	direccio = Direction.FORWARD;
 				else if (cmPosition > carrerActual.cmLong) direccio = Direction.BACKWARD;
 			}
@@ -110,7 +110,7 @@ public class Avio extends Thread {
 	private void aterrar(){
 		speed -= ACCELERACIO;
 		
-		if (speed < Aeroport.VELOCITAT_SEGURITAT) estat = EstatAvio.GOFINGER;
+		if (speed < Aeroport.VELOCITAT_SEGURITAT) estat = Estat.GOFINGER;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class Avio extends Thread {
 	private void despegar() {
 		speed += ACCELERACIO;
 		
-		if (speed > Aeroport.VELOCITAT_DE_VOL) estat = EstatAvio.VOLANT;		
+		if (speed > Aeroport.VELOCITAT_DE_VOL) estat = Estat.VOLANT;		
 	}
 	
 	/**
@@ -137,8 +137,9 @@ public class Avio extends Thread {
 			
 			while(aeroport.getCarrerCritic().getAvions().size() >= 4) Thread.sleep(Aeroport.SLEEP_TIME);
 			
-			cmPosition = finger.getCmLong();
-			estat = EstatAvio.GOPISTA;
+			cmPosition = finger.getCmLong() - cmLong;
+			direccio = Direction.BACKWARD;
+			estat = Estat.GOPISTA;
 			aeroport.canviarEstatFinger(finger, EstatFinguer.buit);
 			posicio = 0;
 		} catch (InterruptedException e) {
@@ -169,11 +170,11 @@ public class Avio extends Thread {
 					if (posicio + 1 < ruta.size()) proximCruce = carrerActual.getNextCrossRoad(ruta.get(posicio+1), carrerActual);
 
 					direccio = obtenirDireccio(cruceActual, proximCruce);
-					
-					if (carrerActual instanceof Finger) estat = EstatAvio.DINS_FINGER;
+
+					if (carrerActual instanceof Finger) estat = Estat.DINS_FINGER;
 					
 					if(carrerActual.getId().equals("pista")) {
-						this.estat = EstatAvio.DESPEGANT;
+						this.estat = Estat.DESPEGANT;
 						direccio = aeroport.direccioDespegue();
 					}
 					
@@ -239,12 +240,7 @@ public class Avio extends Thread {
 			}
 	   		
 	   		g.drawString(idAvio, iniX, iniY);
-	   		
-	   		iniX = carrerActual.getCmPosIniX() + cmPosition;
-			iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
-	   		g.fillRect(iniX, iniY, finX+100, finY+100);
-
-	   		
+	
    		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
    			
    			iniY=(int)((((this.carrerActual.cmIniY+this.cmPosition))/factorY)+offsetY);
@@ -257,9 +253,6 @@ public class Avio extends Thread {
 				g.drawImage(this.imgAvioV, iniX, iniY, finY, finX, null);
 			}
 	   		g.drawString(idAvio, iniX, iniY);
-	   		iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
-			iniY =  carrerActual.getCmPosIniY() + cmPosition;
-	   		g.fillRect(iniX, iniY, finX, finY);
    		}
     }
 	
@@ -360,7 +353,7 @@ public class Avio extends Thread {
 		return this.cmLong;
 	}
 	
-	public EstatAvio getEstat(){
+	public Estat getEstat(){
 		return estat;
 	}
 

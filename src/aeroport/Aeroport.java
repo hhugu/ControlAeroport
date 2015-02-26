@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import ciutat.ControlTrafic;
 import aeroport.Avio.Direction;
 import aeroport.Finger.EstatFinguer;
 
@@ -35,23 +36,25 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	public static final int SLEEP_TIME = 20;
 	public static final int VELOCITAT_SEGURITAT = 50, VELOCITAT_DE_VOL = 460; 
 
-
     private static volatile boolean pauseCity;
     private static volatile boolean endCity;
         
     ArrayList <Avio> avions = new ArrayList<Avio>();
-	private ArrayList <Carrer> carrers;
+	private ArrayList <Carrer> pistes;
 	private ArrayList <Finger> fingers;
 	private ArrayList <String> rutaAlFingerOest, rutaDespegueOest, rutaAlFingerEst, rutaDespegueEst;
 	
     private Mapa mapa;
+    private ControlTrafic controladorTrafic;
     
     public Aeroport() {
     	setDefaultCloseOperation(EXIT_ON_CLOSE);
     	
         mapa = new Mapa(Aeroport.CIUTAT_CM_WIDTH, Aeroport.CIUTAT_CM_HEIGHT, Aeroport.MAPA_PIX_WIDTH, Aeroport.MAPA_PIX_HEIGH, this);
-        
-        carrers = mapa.getCarrers();
+        controladorTrafic = new ControlTrafic(mapa);
+        mapa.setControltrafic(controladorTrafic);
+
+        pistes = mapa.getPistes();
         fingers = mapa.getFingers();
         
         createFrame();
@@ -227,16 +230,12 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		//Ruta Est: Aterra i despega envant
 		rutaAlFingerEst = new ArrayList<String>();
 		rutaAlFingerEst.add("fiPista");
-		rutaAlFingerEst.add("h2");
-		rutaAlFingerEst.add("iniciPista");
-		rutaAlFingerEst.add(("h1"));
-		rutaAlFingerEst.add(("v1"));
 		rutaAlFingerEst.add(("goFingers"));
 		
 		rutaDespegueEst = new ArrayList<String>();
 		rutaDespegueEst.add(("goFingers"));
-		rutaDespegueEst.add(("fiPista"));
-		rutaDespegueEst.add("h2");
+		rutaDespegueEst.add(("v1"));
+		rutaDespegueEst.add("h1");
 		rutaDespegueEst.add("iniciPista");
 		rutaDespegueEst.add(("pista"));
 		
@@ -334,6 +333,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 			}
 		}
 		if(estat.equals(EstatFinguer.buit)) notify();
+		if(estat.equals(EstatFinguer.ocupat)) controladorTrafic.addCotxe();
 	}
 	
 	/*
@@ -409,7 +409,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		Avio avioQueSeMou;
 		for (int i = 0; i < avions.size(); i++) {
 			avioQueSeMou = avions.get(i);
-			if (!avioQueDemanaPermis.equals(avioQueSeMou)) {
+			if (!avioQueDemanaPermis.equals(avioQueSeMou) && avioQueSeMou.getEstat() != null) {
 				if(avioQueDemanaPermis.posicioQueOcupare().intersects(avioQueSeMou.posicioQueOcup())) return false;
 			}
 		}
@@ -455,9 +455,9 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         		Finger finger = afegirFingerARuta(rutaAlFinger);
         			
         		try {
-        			addAvio("A10"+i, carrers.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
+        			addAvio("A10"+i, pistes.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
         			rutaAlFinger.remove(rutaAlFinger.size()-1);
-        			Thread.sleep(200);
+        			Thread.sleep(500);
         		} catch (InterruptedException e) {
         			e.printStackTrace();
         		}
@@ -468,8 +468,8 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
     }
     
     public Carrer getCarrerCritic(){
-    	for (int i = 0; i < carrers.size(); i++) {
-    		if (carrers.get(i).getId().equals("fiPista")) return carrers.get(i);
+    	for (int i = 0; i < pistes.size(); i++) {
+    		if (pistes.get(i).getId().equals("fiPista")) return pistes.get(i);
 		}
     	return null;
     }

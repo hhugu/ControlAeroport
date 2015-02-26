@@ -7,7 +7,7 @@ import aeroport.Avio.Direction;
 
 public abstract class Carrer {
 
-    protected String idWay;
+	protected String idWay;
     protected int cmLong;
     protected int cmIniX;
     protected int cmIniY;
@@ -60,6 +60,22 @@ public abstract class Carrer {
     public int getCmPosIniY() {
         return this.cmIniY;
     }
+    
+    public int getCmIniX() {
+		return cmIniX;
+	}
+
+	public int getCmIniY() {
+		return cmIniY;
+	}
+
+	public int getCmFinX() {
+		return cmFinX;
+	}
+
+	public int getCmFinY() {
+		return cmFinY;
+	}
 
     public int getEntryPoint(Direction direction) {
         int cmPosition = 0;
