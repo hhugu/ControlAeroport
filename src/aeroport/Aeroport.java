@@ -357,7 +357,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 */
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
 		int random = (int)(Math.random()*5);
-		
+		random = 0;
 		if(random == 0 || random == 4){
 			Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
 			avions.add(avio);

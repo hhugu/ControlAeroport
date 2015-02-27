@@ -20,9 +20,9 @@ import aeroport.Finger.EstatFinguer;
 
 public class Avio extends Thread {
 	
-   protected static int ACCELERACIO = 10;
-   protected static int VEL_PISTA = 40;
-   protected static int VEL_VOL = 460;
+   protected int ACCELERACIO = 10;
+   protected int VEL_PISTA = 40;
+   protected int VEL_VOL = 460;
     public static enum Estat {ATERRANT, GOFINGER, DINS_FINGER, GOPISTA, DESPEGANT, VOLANT};    
 	public static enum Direction {FORWARD, BACKWARD}
 	protected int cmLong, cmWidth;

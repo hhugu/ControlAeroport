@@ -15,10 +15,7 @@ public class Caza extends Avio{
 	public Caza(Aeroport aeroport, String idAvio, Carrer way, Direction direction, Finger finger, ArrayList<String> rutaAlFinger,
 			ArrayList<String> rutaDespegue) {
 		super(aeroport, idAvio, way, direction, finger, rutaAlFinger, rutaDespegue);
-		ACCELERACIO = 20;
-		VEL_PISTA = 50;
-		VEL_VOL = 1000;
-		speed = VEL_VOL;
+		
 		try {
 			imgAvioH = ImageIO.read(new File("Imagenes/caza/cazaH.png"));
 			imgAvioV = ImageIO.read(new File("Imagenes/caza/cazaV.png"));
@@ -26,5 +23,10 @@ public class Caza extends Avio{
 			imgAvioVB = ImageIO.read(new File("Imagenes/caza/cazaVB.png"));
 		} catch (IOException e) {
 		}
+		
+		ACCELERACIO = 20;
+		VEL_PISTA = 50;
+		VEL_VOL = 1000;
+		speed = VEL_VOL;	
 	}
 }
