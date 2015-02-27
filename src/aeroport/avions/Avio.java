@@ -27,19 +27,20 @@ public class Avio extends Thread {
 	public static enum Direction {FORWARD, BACKWARD}
 	protected int cmLong, cmWidth;
     protected Image imgAvioH, imgAvioV, imgAvioHB, imgAvioVB;
-    private String idAvio;
+    protected String idAvio;
 
-	private Estat estat;
-	private Aeroport aeroport;
-	private Finger finger;
-    private ArrayList<String> rutaAlFinger, rutaDespegue;
-    private int posicio = 0;
+	protected Estat estat;
+	protected Aeroport aeroport;
+	protected Finger finger;
+    protected ArrayList<String> rutaAlFinger;
+	protected ArrayList<String> rutaDespegue;
+    protected int posicio = 0;
     
-    private volatile int cmPosition;
+    protected volatile int cmPosition;
 	protected volatile int speed;
-    private volatile Carrer carrerActual;
+    protected volatile Carrer carrerActual;
     private CrossRoad cruceActual, proximCruce;
-    private Direction direccio;
+    protected Direction direccio;
 
     public Avio(Aeroport aeroport, String idAvio, Carrer way, Direction direction, Finger finger, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue) {
         this.aeroport = aeroport;
@@ -86,8 +87,8 @@ public class Avio extends Thread {
 	}
 	
 	private void calcularEntrada() {
-		if (direccio == Direction.BACKWARD) cmPosition = carrerActual.getCmLong()+8000;			
-		else if(direccio == Direction.FORWARD) cmPosition = -8000;		
+		if (direccio == Direction.BACKWARD) cmPosition = carrerActual.getCmLong();			
+		else if(direccio == Direction.FORWARD) cmPosition = 0;		
 	}
 	
 	/**
@@ -96,7 +97,7 @@ public class Avio extends Thread {
 	 * Si per cualsevol cosa arriba al principi o al final del carrer canvia de diraccio.
 	 * @author hugu
 	 */
-	private void avançar() {
+	protected void avançar() {
 		if (aeroport.pucAvançar(this)) {
 			if (direccio == Direction.BACKWARD)	cmPosition -= speed;
 			else if (direccio == Direction.FORWARD) cmPosition += speed;
@@ -129,15 +130,15 @@ public class Avio extends Thread {
 	private void despegar() {
 		speed += ACCELERACIO;
 		
-		if (speed > VEL_VOL) estat = Estat.VOLANT;		
+		if (speed > VEL_VOL && (cmPosition <= 0 || cmPosition >= carrerActual.getCmLong())) estat = Estat.VOLANT;		
 	}
 	
 	/**
 	 * Cambia l'estat del seu finger a ocupat. Simula una estada al finger, cambia l'estat de l'avio a 
 	 * GOPISTA i el del finger a buit. 
 	 */
-	private void descarregarCarregar() {
-		aeroport.canviarEstatFinger(finger, EstatFinguer.ocupat);
+	protected void descarregarCarregar() {
+		aeroport.canviarEstatFinger(finger, EstatFinguer.ocupat, this);
 		
 		direccio = Direction.FORWARD;
 		while((cmPosition + cmLong + 300) <= carrerActual.getCmLong()) avançar();					
@@ -149,7 +150,7 @@ public class Avio extends Thread {
 			cmPosition = finger.getCmLong() - cmLong;
 			direccio = Direction.BACKWARD;
 			estat = Estat.GOPISTA;
-			aeroport.canviarEstatFinger(finger, EstatFinguer.buit);
+			aeroport.canviarEstatFinger(finger, EstatFinguer.buit, this);
 			posicio = 0;
 		} catch (InterruptedException e) {
 		}		
@@ -163,9 +164,9 @@ public class Avio extends Thread {
 	 * Calcula si el carrer que cruza amb el carrer on esta es el proxim que ha d'agafar, si es aixo l'agafa.
 	 * Calcula amb quina direccio ha d'entrar al nou carre i a quina posicio. Si entra a un finger canvia
 	 * l'estat de l'avio a DINS_FINGER i si es la pista a DESPEGANT.
-	 * @param ruta
+	 * @param ruta - ArrayList<String>
 	 */
-    private void calcularProximCarrer(ArrayList<String> ruta) {
+    protected void calcularProximCarrer(ArrayList<String> ruta) {
     	
     	if (carrerActual.insideAnyCrossRoad(cmPosition)) {
 			cruceActual = carrerActual.intersectedCrossRoad(cmPosition);

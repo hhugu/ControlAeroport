@@ -7,10 +7,13 @@ import aeroport.Carrer;
 import aeroport.Finger;
 import aeroport.Mapa;
 import aeroport.Finger.EstatFinguer;
+import aeroport.avions.Avio;
+import aeroport.avions.AvioComercial;
+import aeroport.avions.Caza;
 
 public class ControlTrafic {
 	
-	private static final int MAX_COTXES = 10;
+	private static final int MAX_COTXES = 20;
 	private ArrayList <Carrer> carrers;
 	private ArrayList <Cotxe> cotxes;
 	private int j = 0;
@@ -22,15 +25,15 @@ public class ControlTrafic {
 	}
 	
 	/**
-	 * Helper per obtenir el primer finger buit. Un cop obtes el reserva per l'avio.
-	 * @return - fingerDisponible - Finger
+	 * Helper per obtenir el primer parking buit. Un cop obtes el reserva per el cotxe.
+	 * @return - parkingDisponible - Finger
 	 */
-	private Finger getPrimerFingerBuit(){
+	private Finger getPrimerParkingBuit(){
 		Finger fingerDisponible;
 		for (int i = 1; i < carrers.size(); i++) {
 			fingerDisponible = (Finger) carrers.get(i);
 			if (fingerDisponible.estaDisponible()) {
-				this.canviarEstatFinger(fingerDisponible, EstatFinguer.reservat);
+				this.canviarEstatParking(fingerDisponible, EstatFinguer.reservat);
 				return (Finger) carrers.get(i);
 			}
 		}
@@ -38,13 +41,13 @@ public class ControlTrafic {
 	}
 	
 	/**
-	 * Helper per canviar l'estat a un figuer. Si el finguer es buida notifica a qui espera que n'hi ha un de buit.
-	 * @param finger - Finger
+	 * Helper per canviar l'estat a un parking.
+	 * @param parking - Finger
 	 * @param estat - EstatFinger
 	 */
-	public synchronized void canviarEstatFinger(Finger finger, EstatFinguer estat){
+	public synchronized void canviarEstatParking(Finger parking, EstatFinguer estat){
 		for (int i = 1; i < carrers.size(); i++) {
-			if (carrers.get(i).equals(finger)) {
+			if (carrers.get(i).equals(parking)) {
 				((Finger) carrers.get(i)).setEstat(estat);
 			}
 		}
@@ -56,23 +59,29 @@ public class ControlTrafic {
 		}
 	}
 
-	public void addCotxe(){
-		int random=(int)(Math.random()*6);		
-		if (random > 3) {
-			for (int i = 3; i < random; i++) {
-				Finger finger = getPrimerFingerBuit();
-				Bus bus = new Bus(this, "bus"+j, carrers.get(0), finger);
-				bus.start();
-				cotxes.add(bus);
-				j++;
-			}
-		}else{
+	public void addCotxe(Avio avio){
+		int random;
+		if (avio instanceof Caza) {
+			random =(int)(Math.random()*3);		
+
 			for (int i = 0; i < random; i++) {
 				if (cotxes.size() < MAX_COTXES) {
-					Finger finger = getPrimerFingerBuit();
+					Finger finger = getPrimerParkingBuit();
 					Cotxe cotxe = new Cotxe(this, "cotxe" + j, carrers.get(0), finger);
 					cotxe.start();
 					cotxes.add(cotxe);
+					j++;
+				}
+			}
+		}else if(avio instanceof Avio || avio instanceof AvioComercial){
+			random =(int)(Math.random()*3);		
+
+			for (int i = 0; i < random; i++) {
+				if (cotxes.size() < MAX_COTXES) {
+					Finger finger = getPrimerParkingBuit();
+					Bus bus = new Bus(this, "bus"+j, carrers.get(0), finger);
+					bus.start();
+					cotxes.add(bus);
 					j++;
 				}
 			}
@@ -81,6 +90,7 @@ public class ControlTrafic {
 
 	public void deleteCotxe(Cotxe cotxe) {
 		cotxes.remove(cotxe);
+		cotxe.stop();
 	}
 	
 	/**

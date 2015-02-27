@@ -321,15 +321,15 @@ public class Mapa extends Canvas implements Runnable {
     }
     
     private void loadCarrers(){
-    	carrers.add(new HCarrer("carrer1", false, cmHCarrerWidth, 33000, 0, 16000));
+    	carrers.add(new HCarrer("carrer1", false, cmHCarrerWidth, 33000, 0, 16500));
     	int posx = 8100;
     	for (int i = 0; i < 4; i++){
-    		carrers.add(new Finger("parking1"+i, cmHCarrerWidth, 1600, posx, 14400));
+    		carrers.add(new Finger("parking1"+i, cmHCarrerWidth, 2100, posx, 14400));
 			posx+=1300;
     	}
     	posx = 16500;
     	for (int i = 0; i < 5; i++){
-    		carrers.add(new Finger("parking2"+i, cmHCarrerWidth, 1600, posx, 14400));
+    		carrers.add(new Finger("parking2"+i, cmHCarrerWidth, 2100, posx, 14400));
 			posx+=1300;
     	}
 

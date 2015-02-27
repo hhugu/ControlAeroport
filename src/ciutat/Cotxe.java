@@ -15,12 +15,11 @@ import aeroport.Finger;
 import aeroport.HCarrer;
 import aeroport.VCarrer;
 import aeroport.Finger.EstatFinguer;
-import aeroport.avions.Avio;
 import aeroport.avions.Avio.Direction;
 
 public class Cotxe extends Thread{
 	public static enum Estat {CAPALPARKING, DINSELPARKING, CAPACASES}
-	private int cmLong, cmWidth;
+	protected int cmLong, cmWidth;
     protected Image imgCotxeH;
 	protected Image imgCotxeV;
 	protected Image imgCotxeHB;
@@ -80,7 +79,7 @@ public class Cotxe extends Thread{
 
 	private void recollirPassatgers() {
 		cmPosition = carrerActual.getCmLong();
-		controlador.canviarEstatFinger(parking, EstatFinguer.ocupat);
+		controlador.canviarEstatParking(parking, EstatFinguer.ocupat);
 		while(cmPosition > 0) avançar();
 		
 		try {
@@ -90,7 +89,7 @@ public class Cotxe extends Thread{
 		
 		direccio = Direction.FORWARD;
 		estat = Estat.CAPACASES;
-		controlador.canviarEstatFinger(parking, EstatFinguer.buit);
+		controlador.canviarEstatParking(parking, EstatFinguer.buit);
 
 	}
 

@@ -4,7 +4,6 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import aeroport.Aeroport;
 import aeroport.Carrer;
 import aeroport.Finger;
 
@@ -19,7 +18,8 @@ public class Bus extends Cotxe{
 			imgCotxeVB = ImageIO.read(new File("Imagenes/bus/busVB.png"));
 		} catch (Exception e) {
 		}
-    	        
+    	
+		cmLong = 1300;
         speed = 30;
 	}
 

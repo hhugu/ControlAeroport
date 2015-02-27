@@ -303,7 +303,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 		for (int i = 0; i < fingers.size(); i++) {
 			fingerDisponible = fingers.get(i);
 			if (fingerDisponible.estaDisponible()) {
-				this.canviarEstatFinger(fingerDisponible, EstatFinguer.reservat);
+				this.canviarEstatFinger(fingerDisponible, EstatFinguer.reservat, null);
 				return fingers.get(i);
 			}
 		}
@@ -316,9 +316,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 */
 	private boolean hiHaUnQualqueFinguerBuit() {
 		for (int i = 0; i < fingers.size(); i++) {
-			if (fingers.get(i).estaDisponible()) {
-				return true;
-			}
+			if (fingers.get(i).estaDisponible()) return true;
 		}		
 		return false;
 	}
@@ -328,14 +326,14 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 * @param finger - Finger
 	 * @param estat - EstatFinger
 	 */
-	public synchronized void canviarEstatFinger(Finger finger, EstatFinguer estat){
+	public synchronized void canviarEstatFinger(Finger finger, EstatFinguer estat, Avio avio){
 		for (int i = 0; i < fingers.size(); i++) {
 			if (fingers.get(i).equals(finger)) {
 				fingers.get(i).setEstat(estat);
 			}
 		}
 		if(estat.equals(EstatFinguer.buit)) notify();
-		if(estat.equals(EstatFinguer.ocupat)) controladorTrafic.addCotxe();
+		if(estat.equals(EstatFinguer.ocupat)) controladorTrafic.addCotxe(avio);
 	}
 	
 	/*
@@ -357,12 +355,11 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 */
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
 		int random = (int)(Math.random()*5);
-		random = 0;
 		if(random == 0 || random == 4){
 			Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
 			avions.add(avio);
 			(avio).start();
-		}else if(random == 1 || random == 3){
+		}else if(random == 1 || random == 3){			
 			AvioComercial avioComercial = new AvioComercial(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
 			avions.add(avioComercial);
 			(avioComercial).start();
