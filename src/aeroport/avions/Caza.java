@@ -12,6 +12,10 @@ import aeroport.Finger;
 
 public class Caza extends Avio{
 	
+	 protected static final int ACCELERACIO = 20;
+	 protected static final int VEL_PISTA = 50;
+	 protected static final int VEL_VOL = 1000;
+	 
 	public Caza(Aeroport aeroport, String idAvio, Carrer way, Direction direction, Finger finger, ArrayList<String> rutaAlFinger,
 			ArrayList<String> rutaDespegue) {
 		super(aeroport, idAvio, way, direction, finger, rutaAlFinger, rutaDespegue);
@@ -23,10 +27,5 @@ public class Caza extends Avio{
 			imgAvioVB = ImageIO.read(new File("Imagenes/caza/cazaVB.png"));
 		} catch (IOException e) {
 		}
-		
-		ACCELERACIO = 20;
-		VEL_PISTA = 50;
-		VEL_VOL = 1000;
-		speed = VEL_VOL;	
 	}
 }

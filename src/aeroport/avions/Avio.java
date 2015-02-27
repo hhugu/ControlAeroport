@@ -20,9 +20,9 @@ import aeroport.Finger.EstatFinguer;
 
 public class Avio extends Thread {
 	
-   protected int ACCELERACIO = 10;
-   protected int VEL_PISTA = 40;
-   protected int VEL_VOL = 460;
+   protected static final int ACCELERACIO = 10;
+   protected static final int VEL_PISTA = 40;
+   protected static final int VEL_VOL = 460;
     public static enum Estat {ATERRANT, GOFINGER, DINS_FINGER, GOPISTA, DESPEGANT, VOLANT};    
 	public static enum Direction {FORWARD, BACKWARD}
 	protected int cmLong, cmWidth;
@@ -117,8 +117,8 @@ public class Avio extends Thread {
 	 * es menor que la maxima per circular dins l'aeroport cambia l'estat de l'avio a GOFINGER.
 	 */
 	private void aterrar(){
-		if (speed - ACCELERACIO > VEL_PISTA) speed -= ACCELERACIO;
-		else speed = VEL_PISTA;
+		speed -= ACCELERACIO;
+
 		if (speed == VEL_PISTA) estat = Estat.GOFINGER;
 	}
 
