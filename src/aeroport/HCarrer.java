@@ -7,7 +7,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Iterator;
 
-import aeroport.Avio.Direction;
+import aeroport.avions.Avio;
+import aeroport.avions.Avio.Direction;
 
 public class HCarrer extends Carrer {
 

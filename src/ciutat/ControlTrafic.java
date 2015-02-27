@@ -11,14 +11,12 @@ import aeroport.Finger.EstatFinguer;
 public class ControlTrafic {
 	
 	private static final int MAX_COTXES = 10;
-	private Mapa mapa;
 	private ArrayList <Carrer> carrers;
 	private ArrayList <Cotxe> cotxes;
 	private int j = 0;
 
 
 	public ControlTrafic(Mapa mapa){
-		this.mapa = mapa;
 		carrers = mapa.getCarrers();
 		cotxes = new ArrayList<Cotxe>();
 	}
@@ -59,9 +57,7 @@ public class ControlTrafic {
 	}
 
 	public void addCotxe(){
-		int random=(int)(Math.random()*6);
-		System.out.println(random);
-		
+		int random=(int)(Math.random()*6);		
 		if (random > 3) {
 			for (int i = 3; i < random; i++) {
 				Finger finger = getPrimerFingerBuit();

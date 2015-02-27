@@ -3,7 +3,8 @@ package aeroport;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-import aeroport.Avio.Direction;
+import aeroport.avions.Avio;
+import aeroport.avions.Avio.Direction;
 
 public abstract class Carrer {
 

@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Iterator;
 
-import aeroport.Avio.Direction;
+import aeroport.avions.Avio;
+import aeroport.avions.Avio.Direction;
 
 public class Finger extends Carrer {
 	

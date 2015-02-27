@@ -1,4 +1,4 @@
-package aeroport;
+package aeroport.avions;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,15 +10,23 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import aeroport.Aeroport;
+import aeroport.Carrer;
+import aeroport.CrossRoad;
+import aeroport.Finger;
+import aeroport.HCarrer;
+import aeroport.VCarrer;
 import aeroport.Finger.EstatFinguer;
 
 public class Avio extends Thread {
 	
-	private static final int ACCELERACIO = 5;
+   protected static int ACCELERACIO = 10;
+   protected static int VEL_PISTA = 40;
+   protected static int VEL_VOL = 460;
     public static enum Estat {ATERRANT, GOFINGER, DINS_FINGER, GOPISTA, DESPEGANT, VOLANT};    
 	public static enum Direction {FORWARD, BACKWARD}
-	private int cmLong, cmWidth;
-    private Image imgAvioH, imgAvioV, imgAvioHB, imgAvioVB;
+	protected int cmLong, cmWidth;
+    protected Image imgAvioH, imgAvioV, imgAvioHB, imgAvioVB;
     private String idAvio;
 
 	private Estat estat;
@@ -27,7 +35,8 @@ public class Avio extends Thread {
     private ArrayList<String> rutaAlFinger, rutaDespegue;
     private int posicio = 0;
     
-    private volatile int cmPosition, speed;
+    private volatile int cmPosition;
+	protected volatile int speed;
     private volatile Carrer carrerActual;
     private CrossRoad cruceActual, proximCruce;
     private Direction direccio;
@@ -45,7 +54,7 @@ public class Avio extends Thread {
         
         cmLong = cmWidth = 1000;
         
-        speed = Aeroport.VELOCITAT_DE_VOL;
+        speed = VEL_VOL;
         
         this.finger = finger;
         this.rutaAlFinger = rutaAlFinger;
@@ -94,7 +103,7 @@ public class Avio extends Thread {
 			
 			if (estat != Estat.VOLANT && estat != Estat.ATERRANT && estat != Estat.DESPEGANT) {
 				if (cmPosition < 0)	direccio = Direction.FORWARD;
-				else if (cmPosition > carrerActual.cmLong) direccio = Direction.BACKWARD;
+				else if (cmPosition > carrerActual.getCmLong()) direccio = Direction.BACKWARD;
 			}
 		}
 		try {
@@ -108,9 +117,9 @@ public class Avio extends Thread {
 	 * es menor que la maxima per circular dins l'aeroport cambia l'estat de l'avio a GOFINGER.
 	 */
 	private void aterrar(){
-		speed -= ACCELERACIO;
-		
-		if (speed < Aeroport.VELOCITAT_SEGURITAT) estat = Estat.GOFINGER;
+		if (speed - ACCELERACIO > VEL_PISTA) speed -= ACCELERACIO;
+		else speed = VEL_PISTA;
+		if (speed == VEL_PISTA) estat = Estat.GOFINGER;
 	}
 
 	/**
@@ -120,7 +129,7 @@ public class Avio extends Thread {
 	private void despegar() {
 		speed += ACCELERACIO;
 		
-		if (speed > Aeroport.VELOCITAT_DE_VOL) estat = Estat.VOLANT;		
+		if (speed > VEL_VOL) estat = Estat.VOLANT;		
 	}
 	
 	/**
@@ -229,8 +238,8 @@ public class Avio extends Thread {
    		
    		if(carrerActual instanceof HCarrer){
    			
-   	   		iniX=(int)((((this.carrerActual.cmIniX+this.cmPosition))/factorX)+offsetX);
-   	   		iniY=(int)((((this.carrerActual.cmFinY+this.carrerActual.cmIniY)/2-400)/factorY)+offsetY);
+   	   		iniX=(int)((((this.carrerActual.getCmIniX()+this.cmPosition))/factorX)+offsetX);
+   	   		iniY=(int)((((this.carrerActual.getCmFinY()+this.carrerActual.getCmIniY())/2-400)/factorY)+offsetY);
    	   		
 	   		if (direccio==Direction.BACKWARD) {
 	   			g.drawImage(this.imgAvioHB, iniX, iniY, finX, finY, null);
@@ -243,8 +252,8 @@ public class Avio extends Thread {
 	
    		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
    			
-   			iniY=(int)((((this.carrerActual.cmIniY+this.cmPosition))/factorY)+offsetY);
-   	   		iniX=(int)((((this.carrerActual.cmIniX+this.carrerActual.cmFinX)/2-400)/factorX)+offsetX);
+   			iniY=(int)((((this.carrerActual.getCmIniY()+this.cmPosition))/factorY)+offsetY);
+   	   		iniX=(int)((((this.carrerActual.getCmIniX()+this.carrerActual.getCmFinX())/2-400)/factorX)+offsetX);
    	   		
    			if (direccio==Direction.BACKWARD) {
 	   			g.drawImage(this.imgAvioVB, iniX, iniY, finY, finX, null);
@@ -265,17 +274,17 @@ public class Avio extends Thread {
 		if (carrerActual instanceof HCarrer) {
 			if (direccio == Direction.FORWARD) {
 				iniX = carrerActual.getCmPosIniX() + cmPosition + cmLong;
-				iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
+				iniY = (carrerActual.getCmFinY() + carrerActual.getCmIniY())/2 -400;
 			} else if (direccio == Direction.BACKWARD) {
 				iniX = carrerActual.getCmPosIniX() + cmPosition - cmLong;
-				iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
+				iniY = (carrerActual.getCmFinY() + carrerActual.getCmIniY())/2 -400;
 			}
 		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
 			if (direccio == Direction.FORWARD) {
-				iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
+				iniX = (carrerActual.getCmFinX() + carrerActual.getCmIniX())/2 -400;
 				iniY =  carrerActual.getCmPosIniY() + cmPosition + cmLong;
 			}else if(direccio == Direction.BACKWARD){
-				iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
+				iniX = (carrerActual.getCmFinX() + carrerActual.getCmIniX())/2 -400;
 				iniY =  carrerActual.getCmPosIniY() + cmPosition - cmLong;
 			}
 		}
@@ -287,9 +296,9 @@ public class Avio extends Thread {
    		
 		if (carrerActual instanceof HCarrer) {
 			iniX = carrerActual.getCmPosIniX() + cmPosition;
-			iniY = (carrerActual.cmFinY + carrerActual.cmIniY)/2 -400;
+			iniY = (carrerActual.getCmFinY() + carrerActual.getCmIniY())/2 -400;
 		}else if(carrerActual instanceof VCarrer || carrerActual instanceof Finger){
-			iniX = (carrerActual.cmFinX + carrerActual.cmIniX)/2 -400;
+			iniX = (carrerActual.getCmFinX() + carrerActual.getCmIniX())/2 -400;
 			iniY =  carrerActual.getCmPosIniY() + cmPosition;
 		}
 		return new Rectangle(iniX, iniY, cmLong, cmWidth);

@@ -9,14 +9,14 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import aeroport.Aeroport;
-import aeroport.Avio;
 import aeroport.Carrer;
 import aeroport.CrossRoad;
 import aeroport.Finger;
 import aeroport.HCarrer;
 import aeroport.VCarrer;
-import aeroport.Avio.Direction;
 import aeroport.Finger.EstatFinguer;
+import aeroport.avions.Avio;
+import aeroport.avions.Avio.Direction;
 
 public class Cotxe extends Thread{
 	public static enum Estat {CAPALPARKING, DINSELPARKING, CAPACASES}
@@ -31,7 +31,7 @@ public class Cotxe extends Thread{
     protected volatile int cmPosition, speed;
     private volatile Carrer carrerActual, carrerPrincipal;
     private CrossRoad cruceActual;
-    private aeroport.Avio.Direction direccio;
+    private aeroport.avions.Avio.Direction direccio;
     private Estat estat;
 	private Finger parking;
     
@@ -49,7 +49,7 @@ public class Cotxe extends Thread{
     	
     	cmLong = cmWidth = 1000;
         
-        speed = Aeroport.VELOCITAT_SEGURITAT;
+        speed = 50;
 
         carrerPrincipal = carrerActual = carrer;
         this.parking = parking;
@@ -207,7 +207,7 @@ public class Cotxe extends Thread{
 		carrerActual = carrer;
 	}
 
-	public void setDirection(aeroport.Avio.Direction direccio) {
+	public void setDirection(aeroport.avions.Avio.Direction direccio) {
 		this.direccio = direccio;
 	}
 	

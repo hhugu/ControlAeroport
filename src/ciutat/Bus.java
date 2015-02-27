@@ -20,7 +20,7 @@ public class Bus extends Cotxe{
 		} catch (Exception e) {
 		}
     	        
-        speed = Aeroport.VELOCITAT_SEGURITAT - 10;
+        speed = 30;
 	}
 
 }

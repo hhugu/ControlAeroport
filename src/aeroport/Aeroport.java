@@ -16,8 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import ciutat.ControlTrafic;
-import aeroport.Avio.Direction;
 import aeroport.Finger.EstatFinguer;
+import aeroport.avions.Avio;
+import aeroport.avions.Avio.Direction;
+import aeroport.avions.AvioComercial;
+import aeroport.avions.Caza;
 
 
 public class Aeroport extends JFrame implements Runnable, MouseWheelListener, ActionListener, ComponentListener {
@@ -34,7 +37,6 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
     public static final int MAPA_PIX_HEIGH = 620;  // Al�ada window 
    private static final int MAX_AVIONS = 10;
 	public static final int SLEEP_TIME = 20;
-	public static final int VELOCITAT_SEGURITAT = 50, VELOCITAT_DE_VOL = 460; 
 
     private static volatile boolean pauseCity;
     private static volatile boolean endCity;
@@ -354,9 +356,21 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
 	 * @param finger - Finger
 	 */
 	private void addAvio(String idavio, Carrer way, Direction direction, ArrayList<String> rutaAlFinger, ArrayList<String> rutaDespegue, Finger finger){
-		Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
-		avions.add(avio);
-		avio.start();
+		int random = (int)(Math.random()*5);
+		
+		if(random == 0 || random == 4){
+			Avio avio = new Avio(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
+			avions.add(avio);
+			(avio).start();
+		}else if(random == 1 || random == 3){
+			AvioComercial avioComercial = new AvioComercial(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
+			avions.add(avioComercial);
+			(avioComercial).start();
+		}else if(random == 2){
+			Caza caza = new Caza(this, idavio, way, direction, finger, rutaAlFinger, rutaDespegue);
+			avions.add(caza);
+			(caza).start();
+		}
 	}
 	
 	/**
@@ -457,7 +471,7 @@ public class Aeroport extends JFrame implements Runnable, MouseWheelListener, Ac
         		try {
         			addAvio("A10"+i, pistes.get(0), direccio, (ArrayList<String>)(rutaAlFinger.clone()), (ArrayList<String>)rutaDespegue.clone(), finger);
         			rutaAlFinger.remove(rutaAlFinger.size()-1);
-        			Thread.sleep(500);
+        			Thread.sleep(1000);
         		} catch (InterruptedException e) {
         			e.printStackTrace();
         		}
